@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:3000") // React 개발 서버 주소
 @RestController
 @RequestMapping("/admin/categories")
 public class AdminCategoryController {
