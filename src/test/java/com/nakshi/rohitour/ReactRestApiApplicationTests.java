@@ -1,10 +1,10 @@
-package com.nakshi.fishingbackend;
+package com.nakshi.rohitour;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class ReactRestApIbApplicationTests {
+class ReactRestApiApplicationTests {
 
     @Test
     void contextLoads() {

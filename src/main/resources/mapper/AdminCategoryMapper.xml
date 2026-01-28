@@ -3,9 +3,10 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.nakshi.fishingbackend.repository.admin.AdminCategoryMapper">
+<mapper namespace="com.nakshi.rohitour.repository.admin.AdminCategoryMapper">
 
-    <resultMap id="CategoryMap" type="com.nakshi.fishingbackend.dto.CategoryDto">
+
+    <resultMap id="CategoryMap" type="com.nakshi.rohitour.dto.CategoryDto">
         <id property="categoryId" column="category_id"/>
         <result property="name" column="name"/>
         <result property="description" column="description"/>
@@ -19,12 +20,12 @@
         SELECT * FROM categories WHERE category_id = #{id}
     </select>
 
-    <insert id="insert" parameterType="com.nakshi.fishingbackend.dto.CategoryDto">
+    <insert id="insert" parameterType="com.nakshi.rohitour.dto.CategoryDto">
         INSERT INTO categories (name, description)
         VALUES (#{name}, #{description})
     </insert>
 
-    <update id="update" parameterType="com.nakshi.fishingbackend.dto.CategoryDto">
+    <update id="update" parameterType="com.nakshi.rohitour.dto.CategoryDto">
         UPDATE categories SET
                               name = #{name},
                               description = #{description}
