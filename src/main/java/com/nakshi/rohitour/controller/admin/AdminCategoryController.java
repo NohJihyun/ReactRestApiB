@@ -1,7 +1,7 @@
-package com.nakshi.fishingbackend.controller.admin;
+package com.nakshi.rohitour.controller.admin;
 
-import com.nakshi.fishingbackend.dto.CategoryDto;
-import com.nakshi.fishingbackend.service.admin.AdminCategoryService;
+import com.nakshi.rohitour.dto.CategoryDto;
+import com.nakshi.rohitour.service.admin.AdminCategoryService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

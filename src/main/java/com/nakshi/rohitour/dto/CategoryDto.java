@@ -1,4 +1,4 @@
-package com.nakshi.fishingbackend.dto;
+package com.nakshi.rohitour.dto;
 
 public class CategoryDto {
     private Long categoryId;

@@ -1,6 +1,6 @@
-package com.nakshi.fishingbackend.repository.admin;
+package com.nakshi.rohitour.repository.admin;
 
-import com.nakshi.fishingbackend.dto.CategoryDto;
+import com.nakshi.rohitour.dto.CategoryDto;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;

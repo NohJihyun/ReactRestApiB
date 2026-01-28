@@ -1,7 +1,7 @@
-package com.nakshi.fishingbackend.service.admin;
+package com.nakshi.rohitour.service.admin;
 
-import com.nakshi.fishingbackend.dto.CategoryDto;
-import com.nakshi.fishingbackend.repository.admin.AdminCategoryMapper;
+import com.nakshi.rohitour.dto.CategoryDto;
+import com.nakshi.rohitour.repository.admin.AdminCategoryMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
