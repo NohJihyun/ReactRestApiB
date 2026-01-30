@@ -5,39 +5,93 @@
 
 <mapper namespace="com.nakshi.rohitour.repository.admin.AdminCategoryMapper">
 
-
     <resultMap id="CategoryMap" type="com.nakshi.rohitour.dto.CategoryDto">
         <id property="categoryId" column="category_id"/>
-        <result property="name" column="name"/>
-        <result property="description" column="description"/>
+
+        <result property="parentId" column="parent_id"/>
+        <result property="categoryCode" column="category_code"/>
+        <result property="categoryName" column="category_name"/>
+
+        <result property="depth" column="depth"/>
+        <result property="sortOrder" column="sort_order"/>
+        <result property="isActive" column="is_active"/>
+
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
     </resultMap>
-
+    <!--
+         트리 구조 정렬(Tree Ordering) 이라고 부르는 패턴
+         대분류 먼저 나오고 → 각 대분류 바로 아래에 자기 소분류들이 묶여서 나오게
+    -->
     <select id="findAll" resultMap="CategoryMap">
-        SELECT * FROM categories
+        SELECT
+            category_id,
+            parent_id,
+            category_code,
+            category_name,
+            depth,
+            sort_order,
+            is_active,
+            created_at,
+            updated_at
+        FROM categories
+        ORDER BY
+            COALESCE(parent_id, category_id), /* 부모기준으로 묶기 */
+            depth ASC,
+            sort_order ASC
     </select>
 
-    <select id="findById" resultMap="CategoryMap" parameterType="long">
-        SELECT * FROM categories WHERE category_id = #{id}
-    </select>
 
     <insert id="insert" parameterType="com.nakshi.rohitour.dto.CategoryDto">
-        INSERT INTO categories (name, description)
-        VALUES (#{name}, #{description})
+        INSERT INTO categories (
+            parent_id,
+            category_code,
+            category_name,
+            depth,
+            sort_order,
+            is_active,
+            created_at,
+            updated_at
+        ) VALUES (
+             #{parentId},
+             #{categoryCode},
+             #{categoryName},
+             #{depth},
+             #{sortOrder},
+             #{isActive},
+             GETDATE(),
+             GETDATE()
+                 )
     </insert>
 
-    <update id="update" parameterType="com.nakshi.rohitour.dto.CategoryDto">
-        UPDATE categories SET
-                              name = #{name},
-                              description = #{description}
-        WHERE category_id = #{categoryId}
-    </update>
+    <!--
+        <select id="findAll" resultMap="CategoryMap">
+            SELECT * FROM categories
+        </select>
 
-    <delete id="delete" parameterType="long">
-        DELETE FROM categories WHERE category_id = #{id}
-    </delete>
+        <select id="findById" resultMap="CategoryMap" parameterType="long">
+            SELECT * FROM categories WHERE category_id = #{id}
+        </select>
 
-    <select id="existsByName" resultType="int" parameterType="string">
-        SELECT COUNT(*) FROM categories WHERE name = #{name}
-    </select>
+        <insert id="insert" parameterType="com.nakshi.rohitour.dto.CategoryDto">
+            INSERT INTO categories (name, description)
+            VALUES (#{name}, #{description})
+        </insert>
+
+        <update id="update" parameterType="com.nakshi.rohitour.dto.CategoryDto">
+            UPDATE categories SET
+                                  name = #{name},
+                                  description = #{description}
+            WHERE category_id = #{categoryId}
+        </update>
+
+        <delete id="delete" parameterType="long">
+            DELETE FROM categories WHERE category_id = #{id}
+        </delete>
+
+        <select id="existsByName" resultType="int" parameterType="string">
+            SELECT COUNT(*) FROM categories WHERE name = #{name}
+        </select>
+    -->
 
 </mapper>
