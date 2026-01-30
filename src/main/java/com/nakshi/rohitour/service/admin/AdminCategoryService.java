@@ -19,23 +19,23 @@ public class AdminCategoryService {
         return categoryMapper.findAll();
     }
 
-    public CategoryDto findById(Long id) {
+   /* public CategoryDto findById(Long id) {
         return categoryMapper.findById(id);
-    }
+    }*/
 
     public int insert(CategoryDto dto) {
         return categoryMapper.insert(dto);
     }
 
-    public int update(CategoryDto dto) {
+    /*public int update(CategoryDto dto) {
         return categoryMapper.update(dto);
-    }
+    }*/
 
-    public int delete(Long id) {
+    /*public int delete(Long id) {
         return categoryMapper.delete(id);
-    }
+    }*/
 
-    public boolean existsByName(String name) {
-        return categoryMapper.existsByName(name) > 0;
-    }
+//    public boolean existsByName(String name) {
+//        return categoryMapper.existsByName(name) > 0;
+//    }
 }
