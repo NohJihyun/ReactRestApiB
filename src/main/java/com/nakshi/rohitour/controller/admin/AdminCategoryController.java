@@ -29,6 +29,7 @@ public class AdminCategoryController {
 
         return categoryService.findAll();
     }
+
     //카테고리
     //단건조회
    /* @GetMapping("/{id}")
@@ -37,34 +38,40 @@ public class AdminCategoryController {
         return categoryService.findById(id);
     }*/
 
-
-
     //카테고리 등록
-    //@ResponseBody JSON/XML 형태로 바로 응답을 리턴
+    //@RequestBody JSON/XML "" 문자열 형태 > 자바객체변환 응답을 리턴
+    //CategoryDto 타입/클래스 로 변환후 , dto 변수에 담아서 전달
     @PostMapping
     public int insert(@RequestBody CategoryDto dto) {
 
         return categoryService.insert(dto);
     }
+
     //카테고리 수정
-    /*@PutMapping
-    public int update(@RequestBody CategoryDto dto) {
-
+    //전체수정
+    //@RequestBody JSON/XML "" 문자열 형태 > 자바객체변환 응답을 리턴
+    //CategoryDto 타입/클래스 로 변환후 , dto 변수에 담아서 전달
+    //프론트 요청 /admin/categories/${id}
+    //@PathVariable 요청 URL 경로에 포함된 id 값을 꺼내서 메서드 파라미터로 사용한다
+    @PutMapping("/{id}")
+    public int update(
+            @PathVariable Long id,
+            @RequestBody CategoryDto dto
+    ) {
+        dto.setCategoryId(id); // id를 DTO에 세팅
         return categoryService.update(dto);
-    }*/
-    //카테고리 삭제
-    // @PathVariable
-    // URL 경로 변수 값 바인딩
-    // 프론트에서 요청시 즉 ,
-    // /admin/categories/{id} 로 요청 처리할때 사용
-  /*  @DeleteMapping("/{id}")
-    public int delete(@PathVariable Long id) {
+    }
+    //DELETE
+    //의미상 삭제 => 비활성화 처리
+    @DeleteMapping("/{id}")
+    public int deactivate(@PathVariable Long id) {
+        return categoryService.deactivate(id);
+    }
 
-        return categoryService.delete(id);
-    }*/
+    /*
     //카테고리명중복체크
     //@RequestParam 쿼리 파라미터 값 바인딩 GET방식 url
-  /*  @GetMapping("/exists")
+    @GetMapping("/exists")
     public boolean existsByName(@RequestParam String name) {
 
         return categoryService.existsByName(name);

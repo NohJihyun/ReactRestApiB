@@ -10,7 +10,7 @@ public interface AdminCategoryMapper {
     List<CategoryDto> findAll();
     //CategoryDto findById(Long id);
     int insert(CategoryDto dto);
-    //int update(CategoryDto dto);
-    //int delete(Long id);
+    int update(CategoryDto dto);
+    int deactivate(Long id);
     //int existsByName(String name);
 }

@@ -24,16 +24,17 @@ public class AdminCategoryService {
     }*/
 
     public int insert(CategoryDto dto) {
+
         return categoryMapper.insert(dto);
     }
 
-    /*public int update(CategoryDto dto) {
+    public int update(CategoryDto dto) {
         return categoryMapper.update(dto);
-    }*/
+    }
 
-    /*public int delete(Long id) {
-        return categoryMapper.delete(id);
-    }*/
+    public int deactivate(Long id) {
+        return categoryMapper.deactivate(id);
+    }
 
 //    public boolean existsByName(String name) {
 //        return categoryMapper.existsByName(name) > 0;
