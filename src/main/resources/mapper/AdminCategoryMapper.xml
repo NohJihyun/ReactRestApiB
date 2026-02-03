@@ -64,34 +64,23 @@
                  )
     </insert>
 
-    <!--
-        <select id="findAll" resultMap="CategoryMap">
-            SELECT * FROM categories
-        </select>
+    <update id="update"  parameterType="com.nakshi.rohitour.dto.CategoryDto">
+        UPDATE categories
+        SET
+            category_name = #{categoryName},
+            sort_order    = #{sortOrder},
+            is_active     = #{isActive},
+            updated_at    = GETDATE()
+        WHERE category_id = #{categoryId}
+    </update>
 
-        <select id="findById" resultMap="CategoryMap" parameterType="long">
-            SELECT * FROM categories WHERE category_id = #{id}
-        </select>
-
-        <insert id="insert" parameterType="com.nakshi.rohitour.dto.CategoryDto">
-            INSERT INTO categories (name, description)
-            VALUES (#{name}, #{description})
-        </insert>
-
-        <update id="update" parameterType="com.nakshi.rohitour.dto.CategoryDto">
-            UPDATE categories SET
-                                  name = #{name},
-                                  description = #{description}
-            WHERE category_id = #{categoryId}
-        </update>
-
-        <delete id="delete" parameterType="long">
-            DELETE FROM categories WHERE category_id = #{id}
-        </delete>
-
-        <select id="existsByName" resultType="int" parameterType="string">
-            SELECT COUNT(*) FROM categories WHERE name = #{name}
-        </select>
-    -->
+    <update id="deactivate" parameterType="long">
+        UPDATE categories
+        SET
+            is_active  = 'N',
+            updated_at = GETDATE()
+        WHERE category_id = #{id}
+          AND is_active = 'Y'
+    </update>
 
 </mapper>
