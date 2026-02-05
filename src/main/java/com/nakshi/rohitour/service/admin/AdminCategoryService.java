@@ -2,8 +2,11 @@ package com.nakshi.rohitour.service.admin;
 
 import com.nakshi.rohitour.dto.CategoryDto;
 import com.nakshi.rohitour.dto.CategorySearchDto;
+import com.nakshi.rohitour.exception.DuplicateException;
+
 import com.nakshi.rohitour.repository.admin.AdminCategoryMapper;
 import org.springframework.stereotype.Service;
+
 
 import java.util.List;
 
@@ -24,11 +27,12 @@ public class AdminCategoryService {
 
     /* 등록 */
     public int insert(CategoryDto dto) {
-
+        validateDuplicate(dto, null);   // 등록 값 검증 추가
         return categoryMapper.insert(dto);
     }
     /* 수정 */
     public int update(CategoryDto dto) {
+        validateDuplicate(dto, dto.getCategoryId()); //자기 자신 제외
         return categoryMapper.update(dto);
     }
    /* 논리 => 비활성화 */
@@ -40,4 +44,28 @@ public class AdminCategoryService {
     public int delete(Long id) {
         return categoryMapper.delete(id);
     }
+
+    //  컨트롤러에서 호출할 공개용 메서드
+    public void checkDuplicate(String categoryCode, int sortOrder, Long excludeId) {
+        CategoryDto dto = new CategoryDto();
+        dto.setCategoryCode(categoryCode);
+        dto.setSortOrder(sortOrder);
+
+        validateDuplicate(dto, excludeId);
+    }
+
+    /* ===== 내부 전용 검증 ===== */
+    public void validateDuplicate(CategoryDto dto, Long excludeId) {
+        int count = categoryMapper.countDuplicate(
+                dto.getDepth(),
+                dto.getParentId(),
+                dto.getSortOrder(),
+                excludeId
+        );
+
+        if (count > 0) {
+            throw new DuplicateException("이미 사용 중인 정렬 순서입니다.");
+        }
+    }
 }
+
