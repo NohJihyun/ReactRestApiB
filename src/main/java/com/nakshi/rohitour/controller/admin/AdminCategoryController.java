@@ -69,4 +69,20 @@ public class AdminCategoryController {
         return categoryService.delete(id);
     }
 
+    //벨리데이션체크 값검증
+    @GetMapping("/duplicate")
+    public void checkDuplicate(
+            @RequestParam int depth,
+            @RequestParam(required = false) Long parentId,
+            @RequestParam int sortOrder,
+            @RequestParam(required = false) Long excludeId
+    ) {
+        CategoryDto dto = new CategoryDto();
+        dto.setDepth(depth);
+        dto.setParentId(parentId);
+        dto.setSortOrder(sortOrder);
+
+        categoryService.validateDuplicate(dto, excludeId);
+    }
+
 }

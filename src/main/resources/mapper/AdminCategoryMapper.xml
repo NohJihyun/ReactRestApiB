@@ -113,4 +113,18 @@
         WHERE category_id = #{id}
     </delete>
 
+    <!-- 중복 체크 -->
+    <select id="countDuplicate" resultType="int">
+        SELECT COUNT(*)
+        FROM categories
+        WHERE depth = #{depth}
+        AND sort_order = #{sortOrder}
+        <if test="parentId != null">
+            AND parent_id = #{parentId}
+        </if>
+        <if test="excludeId != null">
+            AND category_id <![CDATA[<>]]> #{excludeId}
+        </if>
+    </select>
+
 </mapper>

@@ -13,4 +13,10 @@ public interface AdminCategoryMapper {
     int update(CategoryDto dto);
     int deactivate(Long id);
     int delete(Long id);
+    int countDuplicate(
+            int depth,
+            Long parentId,
+            int sortOrder,
+            Long excludeId
+    );
 }
