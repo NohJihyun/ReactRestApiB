@@ -1,6 +1,7 @@
 package com.nakshi.rohitour.controller.admin;
 
 import com.nakshi.rohitour.dto.CategoryDto;
+import com.nakshi.rohitour.dto.CategorySearchDto;
 import com.nakshi.rohitour.service.admin.AdminCategoryService;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,18 +26,10 @@ public class AdminCategoryController {
     //@RestController 로 인해 view가 아닌 응답 바디로 처리
     //응답바디로 사용 JACKSON 을 활용해 JSON으로 내려줌.
     @GetMapping
-    public List<CategoryDto> findAll() {
+    public List<CategoryDto> findAll(CategorySearchDto searchDto) {
 
-        return categoryService.findAll();
+        return categoryService.findAll(searchDto);
     }
-
-    //카테고리
-    //단건조회
-   /* @GetMapping("/{id}")
-    public CategoryDto findById(@PathVariable Long id) {
-
-        return categoryService.findById(id);
-    }*/
 
     //카테고리 등록
     //@RequestBody JSON/XML "" 문자열 형태 > 자바객체변환 응답을 리턴
@@ -61,19 +54,19 @@ public class AdminCategoryController {
         dto.setCategoryId(id); // id를 DTO에 세팅
         return categoryService.update(dto);
     }
-    //DELETE
-    //의미상 삭제 => 비활성화 처리
+    //비활성화
+    // 논리삭제 => 일반운영=> 비활성화 처리
     @DeleteMapping("/{id}")
     public int deactivate(@PathVariable Long id) {
         return categoryService.deactivate(id);
     }
+    //물리삭제
+    //관리자, 테스트, 잘못 만든 데이터
+    //@PathVariable : url / 이어진 경로에 들어온 파라미터 처리
+    //@RequestParam : url 에 쿼리스트링으로 들어온 파라미터 처리
+    @DeleteMapping("/{id}/delete")
+    public int delete(@PathVariable Long id) {
+        return categoryService.delete(id);
+    }
 
-    /*
-    //카테고리명중복체크
-    //@RequestParam 쿼리 파라미터 값 바인딩 GET방식 url
-    @GetMapping("/exists")
-    public boolean existsByName(@RequestParam String name) {
-
-        return categoryService.existsByName(name);
-    }*/
 }
