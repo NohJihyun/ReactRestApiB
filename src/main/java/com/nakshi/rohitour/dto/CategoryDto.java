@@ -2,6 +2,7 @@ package com.nakshi.rohitour.dto;
 
 import java.time.LocalDateTime;
 
+/* 목록 DTO */
 public class CategoryDto {
 
     private Long categoryId;                 // PK
