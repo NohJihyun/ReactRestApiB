@@ -23,7 +23,7 @@
          트리 구조 정렬(Tree Ordering) 이라고 부르는 패턴
          대분류 먼저 나오고 → 각 대분류 바로 아래에 자기 소분류들이 묶여서 나오게
     -->
-    <select id="findAll" resultMap="CategoryMap" parameterType="com.nakshi.rohitour.dto.CategoryDto">
+    <!--<select id="findAll" resultMap="CategoryMap" parameterType="com.nakshi.rohitour.dto.CategoryDto">
         SELECT
         category_id,
         parent_id,
@@ -36,22 +36,22 @@
         updated_at
         FROM categories
         <where>
-            <!-- 분류 (대/소) -->
+            &lt;!&ndash; 분류 (대/소) &ndash;&gt;
             <if test="depth != null">
                 AND depth = #{depth}
             </if>
 
-            <!-- 상위 카테고리 -->
+            &lt;!&ndash; 상위 카테고리 &ndash;&gt;
             <if test="parentId != null">
                 AND parent_id = #{parentId}
             </if>
 
-            <!-- 사용 여부 -->
+            &lt;!&ndash; 사용 여부 &ndash;&gt;
             <if test="isActive != null and isActive != ''">
                 AND is_active = #{isActive}
             </if>
 
-            <!-- 검색어 (이름 / 코드) -->
+            &lt;!&ndash; 검색어 (이름 / 코드) &ndash;&gt;
             <if test="keyword != null and keyword != ''">
                 AND (
                 category_name LIKE '%' + #{keyword} + '%'
@@ -63,6 +63,85 @@
         COALESCE(parent_id, category_id), /* 부모기준으로 묶기 */
         depth ASC,
         sort_order ASC
+
+        &lt;!&ndash; 페이지네이션 추가  &ndash;&gt;
+        OFFSET #{offset} ROWS
+        FETCH NEXT #{size} ROWS ONLY
+    </select>-->
+
+    <select id="findAll" resultMap="CategoryMap">
+        SELECT
+        category_id,
+        parent_id,
+        category_code,
+        category_name,
+        depth,
+        sort_order,
+        is_active,
+        created_at,
+        updated_at
+        FROM categories
+        <where>
+            <if test="search.depth != null">
+                AND depth = #{search.depth}
+            </if>
+
+            <if test="search.parentId != null">
+                AND parent_id = #{search.parentId}
+            </if>
+
+            <!-- 확장 -->
+            <if test="search.categoryId != null">
+                AND category_id = #{search.categoryId}
+            </if>
+
+        <if test="search.isActive != null and search.isActive != ''">
+                AND is_active = #{search.isActive}
+            </if>
+
+            <if test="search.keyword != null and search.keyword != ''">
+                AND (
+                category_name LIKE '%' + #{search.keyword} + '%'
+                OR category_code LIKE '%' + #{search.keyword} + '%'
+                )
+            </if>
+        </where>
+
+        ORDER BY
+        COALESCE(parent_id, category_id),
+        depth ASC,
+        sort_order ASC
+
+        OFFSET #{offset} ROWS
+        FETCH NEXT #{size} ROWS ONLY
+    </select>
+
+
+
+    <!-- 페이지네이션 카운트 -->
+    <select id="countAll" resultType="int">
+        SELECT COUNT(*)
+        FROM categories
+        <where>
+            <if test="search.depth != null">
+                AND depth = #{search.depth}
+            </if>
+
+            <if test="search.parentId != null">
+                AND parent_id = #{search.parentId}
+            </if>
+
+            <if test="search.isActive != null and search.isActive != ''">
+                AND is_active = #{search.isActive}
+            </if>
+
+            <if test="search.keyword != null and search.keyword != ''">
+                AND (
+                category_name LIKE '%' + #{search.keyword} + '%'
+                OR category_code LIKE '%' + #{search.keyword} + '%'
+                )
+            </if>
+        </where>
     </select>
 
 

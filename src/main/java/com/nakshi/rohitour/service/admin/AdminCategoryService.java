@@ -3,6 +3,8 @@ package com.nakshi.rohitour.service.admin;
 import com.nakshi.rohitour.dto.CategoryDto;
 import com.nakshi.rohitour.dto.CategorySearchDto;
 import com.nakshi.rohitour.exception.DuplicateException;
+import com.nakshi.rohitour.common.paging.PageRequest;
+import com.nakshi.rohitour.common.paging.PageResponse;
 
 import com.nakshi.rohitour.repository.admin.AdminCategoryMapper;
 import org.springframework.stereotype.Service;
@@ -16,13 +18,34 @@ public class AdminCategoryService {
     private final AdminCategoryMapper categoryMapper;
 
     public AdminCategoryService(AdminCategoryMapper categoryMapper) {
+
         this.categoryMapper = categoryMapper;
     }
-
-
-    /* 목록리스트 + 검색조건 DTO */
+    /* 목록리스트 + 검색조건 DTO
     public List<CategoryDto> findAll(CategorySearchDto searchDto) {
         return categoryMapper.findAll(searchDto);
+    }
+    */
+
+    /* 목록 + 검색 + 페이지네이션 */
+    public PageResponse<CategoryDto> findAll(
+            PageRequest pageRequest,
+            CategorySearchDto searchDto
+    ) {
+        // 1️ 페이징된 목록 조회
+        List<CategoryDto> list =
+                categoryMapper.findAll(
+                        pageRequest.getOffset(),
+                        pageRequest.getSize(),
+                        searchDto
+                );
+
+        // 2️ 전체 건수 조회 (검색 조건 동일)
+        int totalCount =
+                categoryMapper.countAll(searchDto);
+
+        // 3️ PageResponse로 감싸서 반환
+        return new PageResponse<>(list, totalCount, pageRequest);
     }
 
     /* 등록 */

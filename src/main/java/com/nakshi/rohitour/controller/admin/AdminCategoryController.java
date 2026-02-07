@@ -1,5 +1,7 @@
 package com.nakshi.rohitour.controller.admin;
 
+import com.nakshi.rohitour.common.paging.PageRequest;
+import com.nakshi.rohitour.common.paging.PageResponse;
 import com.nakshi.rohitour.dto.CategoryDto;
 import com.nakshi.rohitour.dto.CategorySearchDto;
 import com.nakshi.rohitour.service.admin.AdminCategoryService;
@@ -25,11 +27,31 @@ public class AdminCategoryController {
     //리턴시 view 네임, 문자열 아닐시 스프링이 감지해
     //@RestController 로 인해 view가 아닌 응답 바디로 처리
     //응답바디로 사용 JACKSON 을 활용해 JSON으로 내려줌.
+    //페이지네이션 쿼리스트링, 쿼리파라미터 활용
+    //GET /admin/categories?page=1&size=10&keyword=전자
+    // “List를 감싸서 규칙을 추가한다”
+
+    /*
+    리스트 목록 + 검색 => 페이지네이션 추가로 인하여 주석처리.
     @GetMapping
     public List<CategoryDto> findAll(CategorySearchDto searchDto) {
 
         return categoryService.findAll(searchDto);
     }
+    */
+
+    //리스트+검색+페이지네이션
+    //페이지네이션을 하기위해서 목록,검색을 감싸서 처리한다.
+    @GetMapping
+    public PageResponse<CategoryDto> findAll(
+            @RequestParam int page,
+            @RequestParam int size,
+            CategorySearchDto searchDto
+    ) {
+        PageRequest pageRequest = new PageRequest(page, size);
+        return categoryService.findAll(pageRequest, searchDto);
+    }
+
 
     //카테고리 등록
     //@RequestBody JSON/XML "" 문자열 형태 > 자바객체변환 응답을 리턴
