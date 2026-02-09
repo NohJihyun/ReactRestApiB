@@ -23,52 +23,6 @@
          트리 구조 정렬(Tree Ordering) 이라고 부르는 패턴
          대분류 먼저 나오고 → 각 대분류 바로 아래에 자기 소분류들이 묶여서 나오게
     -->
-    <!--<select id="findAll" resultMap="CategoryMap" parameterType="com.nakshi.rohitour.dto.CategoryDto">
-        SELECT
-        category_id,
-        parent_id,
-        category_code,
-        category_name,
-        depth,
-        sort_order,
-        is_active,
-        created_at,
-        updated_at
-        FROM categories
-        <where>
-            &lt;!&ndash; 분류 (대/소) &ndash;&gt;
-            <if test="depth != null">
-                AND depth = #{depth}
-            </if>
-
-            &lt;!&ndash; 상위 카테고리 &ndash;&gt;
-            <if test="parentId != null">
-                AND parent_id = #{parentId}
-            </if>
-
-            &lt;!&ndash; 사용 여부 &ndash;&gt;
-            <if test="isActive != null and isActive != ''">
-                AND is_active = #{isActive}
-            </if>
-
-            &lt;!&ndash; 검색어 (이름 / 코드) &ndash;&gt;
-            <if test="keyword != null and keyword != ''">
-                AND (
-                category_name LIKE '%' + #{keyword} + '%'
-                OR category_code LIKE '%' + #{keyword} + '%'
-                )
-            </if>
-        </where>
-        ORDER BY
-        COALESCE(parent_id, category_id), /* 부모기준으로 묶기 */
-        depth ASC,
-        sort_order ASC
-
-        &lt;!&ndash; 페이지네이션 추가  &ndash;&gt;
-        OFFSET #{offset} ROWS
-        FETCH NEXT #{size} ROWS ONLY
-    </select>-->
-
     <select id="findAll" resultMap="CategoryMap">
         SELECT
         category_id,
@@ -116,8 +70,6 @@
         FETCH NEXT #{size} ROWS ONLY
     </select>
 
-
-
     <!-- 페이지네이션 카운트 -->
     <select id="countAll" resultType="int">
         SELECT COUNT(*)
@@ -143,7 +95,6 @@
             </if>
         </where>
     </select>
-
 
     <insert id="insert" parameterType="com.nakshi.rohitour.dto.CategoryDto">
         INSERT INTO categories (
@@ -176,6 +127,7 @@
             updated_at    = GETDATE()
         WHERE category_id = #{categoryId}
     </update>
+
     <!-- 논리 => 비활성화 -->
     <update id="deactivate" parameterType="long">
         UPDATE categories
