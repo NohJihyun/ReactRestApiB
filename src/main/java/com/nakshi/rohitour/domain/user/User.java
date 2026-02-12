@@ -1,9 +1,7 @@
 package com.nakshi.rohitour.domain.user;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -16,9 +14,12 @@ import java.time.LocalDateTime;
  *  jpa 라이브러리가 이객체를 보고 테이블과 연결된 insert, select, update를 자동처리
  */
 @Entity
-@Table(name = "users")
+@Table(name = "users", schema = "dbo")   // MSSQL 정확 명시
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class User {
 
     @Id
@@ -26,44 +27,44 @@ public class User {
     @Column(name = "user_id")
     private Long userId;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "email", nullable = false, unique = true, length = 255)
     private String email;
 
     /**
      * LOCAL 로그인만 사용
      * 소셜 로그인은 NULL
      */
-    @Column
+    @Column(name = "password", length = 255)
     private String password;
 
     /**
      * LOCAL / KAKAO / NAVER / GOOGLE
      */
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
+    @Column(name = "provider", nullable = false, length = 20)
     private AuthProvider provider;
 
     /**
      * 소셜 로그인 고유 ID
      */
-    @Column(name = "provider_id")
+    @Column(name = "provider_id", length = 255)
     private String providerId;
 
     /**
      * USER / ADMIN
      */
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
+    @Column(name = "role", nullable = false, length = 20)
     private UserRole role;
 
     @Column(name = "is_active", nullable = false)
-    private boolean isActive = true;
+    private Boolean isActive;
 
     @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
-    @Column(name = "updated_at")
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 }
