@@ -49,4 +49,8 @@ public class RefreshToken {
     public User getUser() {
         return user;
     }
+
+    public LocalDateTime getExpiresAt() {
+        return expiresAt;
+    }
 }
