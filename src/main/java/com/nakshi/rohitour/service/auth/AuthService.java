@@ -38,16 +38,16 @@ public class AuthService {
 
         // 1️ 사용자 조회
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 이메일입니다."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "존재하지 않는 이메일입니다."));
 
         // 2️ 비밀번호 검증
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new RuntimeException("비밀번호가 일치하지 않습니다.");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"비밀번호가 일치하지 않습니다.");
         }
 
         // 3️ 계정 활성 여부
-        if (!user.getIsActive()) {
-            throw new RuntimeException("비활성화된 계정입니다.");
+        if (!Boolean.TRUE.equals(user.getIsActive())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "비활성화된 계정입니다.");
         }
 
         // 4️ 기존 RefreshToken 삭제 (1계정 1토큰 정책)
@@ -84,7 +84,7 @@ public class AuthService {
                 refreshToken   // 여기 추가 (쿠키용)
         );
     }
-
+    //리이슈
     @Transactional
     public ReissueResponse reissue(String refreshToken) {
 
@@ -102,10 +102,10 @@ public class AuthService {
 
         // 3) 사용자 조회 + 활성 체크
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 사용자입니다."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED,"존재하지 않는 사용자입니다."));
 
-        if (!user.getIsActive()) {
-            throw new RuntimeException("비활성화된 계정입니다.");
+        if (!Boolean.TRUE.equals(user.getIsActive())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "비활성화된 계정입니다.");
         }
 
         // 4) 쿠키 refreshToken을 sha256으로 변환 후 DB에서 조회

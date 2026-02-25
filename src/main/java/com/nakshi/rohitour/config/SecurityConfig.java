@@ -29,9 +29,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtUtil jwtUtil;
+    //private final JwtUtil jwtUtil;
     // JWT 필터 주입
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    //
+    private final SecurityErrorHandler securityErrorHandler;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -54,9 +56,14 @@ public class SecurityConfig {
 
                         .anyRequest().authenticated()
                 )
+                // 여기 추가: 401/403 응답 포맷 통일
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(securityErrorHandler)
+                        .accessDeniedHandler(securityErrorHandler)
+                )
                 // new로 생성하지 말고, 주입된 Bean 사용
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-                System.out.println(new BCryptPasswordEncoder().encode("1234"));
+
         return http.build();
     }
 
