@@ -58,7 +58,7 @@ public class SecurityConfig {
                         ).permitAll()
 
                         // 예: 관리자
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
                         .anyRequest().authenticated()
                 )

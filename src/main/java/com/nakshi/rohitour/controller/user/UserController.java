@@ -2,6 +2,7 @@ package com.nakshi.rohitour.controller.user;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 /*
@@ -19,12 +20,17 @@ public class UserController {
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthenticated");
         }
-        return new MeResponse(authentication.getName());
+
+        String email = authentication.getName();
+
+        String role = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .findFirst()
+                .map(authority -> authority.replace("ROLE_", ""))
+                .orElse("USER");
+
+        return new MeResponse(email, role);
     }
-    /* 토큰 ping 테스트
-   @GetMapping("/ping")
-    public String ping() {
-        return "pong";
-    } */
-    public record MeResponse(String email) {}
+
+    public record MeResponse(String email, String role) {}
 }
