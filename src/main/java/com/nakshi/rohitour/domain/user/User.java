@@ -5,6 +5,7 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /*
@@ -27,14 +28,26 @@ public class User {
     @Column(name = "user_id")
     private Long userId;
 
-    @Column(name = "email", nullable = false, unique = true, length = 255)
+    @Column(name = "login_id", nullable = false, length = 50)
+    private String loginId;
+
+    @Column(name = "name", length = 50)
+    private String name;
+
+    @Column(name = "email", nullable = false,length = 255)
     private String email;
+
+    @Column(name = "birth")
+    private LocalDate birth;
+
+    @Column(name = "phone", length = 20)
+    private String phone;
 
     /**
      * LOCAL 로그인만 사용
      * 소셜 로그인은 NULL
      */
-    @Column(name = "password", length = 255)
+    @Column(name = "password", nullable = false, length = 255)
     private String password;
 
     /**
