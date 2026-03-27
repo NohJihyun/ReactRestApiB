@@ -54,7 +54,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST,
                                 "/api/auth/login",
                                 "/api/auth/reissue",
-                                "/api/auth/logout"
+                                "/api/auth/logout",
+                                "/api/auth/signup",
+                                "/api/auth/email/send",
+                                "/api/auth/email/verify"
                         ).permitAll()
 
                         // 예: 관리자

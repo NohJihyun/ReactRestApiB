@@ -5,10 +5,14 @@ import com.nakshi.rohitour.domain.user.User;
 import com.nakshi.rohitour.dto.LoginRequest;
 import com.nakshi.rohitour.dto.LoginResponse;
 import com.nakshi.rohitour.dto.ReissueResponse;
+import com.nakshi.rohitour.dto.SendEmailCodeRequest;
+import com.nakshi.rohitour.dto.SignUpRequest;
+import com.nakshi.rohitour.dto.VerifyEmailCodeRequest;
 import com.nakshi.rohitour.service.auth.AuthService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -121,6 +125,36 @@ public class AuthController {
         deleteCookie.setMaxAge(0); // 즉시 만료
         response.addCookie(deleteCookie);
 
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * 이메일 인증코드 발송
+     * POST /api/auth/email/send
+     */
+    @PostMapping("/email/send")
+    public ResponseEntity<Void> sendEmailCode(@Valid @RequestBody SendEmailCodeRequest request) {
+        authService.sendEmailCode(request.getEmail());
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * 이메일 인증코드 검증
+     * POST /api/auth/email/verify
+     */
+    @PostMapping("/email/verify")
+    public ResponseEntity<Void> verifyEmailCode(@Valid @RequestBody VerifyEmailCodeRequest request) {
+        authService.verifyEmailCode(request.getEmail(), request.getCode());
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * 회원가입
+     * POST /api/auth/signup
+     */
+    @PostMapping("/signup")
+    public ResponseEntity<Void> signUp(@Valid @RequestBody SignUpRequest request) {
+        authService.signUp(request);
         return ResponseEntity.ok().build();
     }
 
