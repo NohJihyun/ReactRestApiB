@@ -14,4 +14,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     //NPE 예방처리 NULL 대신 Optional 컨테이너 돌려준다.
     Optional<User> findByEmail(String email);
 
+    boolean existsByEmail(String email);
+
+    boolean existsByLoginId(String loginId);
 }

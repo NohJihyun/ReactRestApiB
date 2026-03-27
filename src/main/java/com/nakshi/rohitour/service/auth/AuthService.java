@@ -1,18 +1,27 @@
 package com.nakshi.rohitour.service.auth;
 
 import com.nakshi.rohitour.config.JwtUtil;
+import com.nakshi.rohitour.domain.email.EmailVerification;
+import com.nakshi.rohitour.domain.user.AuthProvider;
 import com.nakshi.rohitour.domain.user.User;
+import com.nakshi.rohitour.domain.user.UserRole;
 import com.nakshi.rohitour.dto.LoginResponse;
 import com.nakshi.rohitour.dto.ReissueResponse;
+import com.nakshi.rohitour.dto.SignUpRequest;
 import com.nakshi.rohitour.repository.auth.RefreshTokenRepository;
+import com.nakshi.rohitour.repository.email.EmailVerificationRepository;
 import com.nakshi.rohitour.repository.user.UserRepository;
+import com.nakshi.rohitour.service.email.EmailService;
 import com.nakshi.rohitour.util.TokenHashUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.nakshi.rohitour.domain.user.auth.RefreshToken;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
+import java.util.Random;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -21,11 +30,11 @@ import org.springframework.web.server.ResponseStatusException;
 public class AuthService {
 
     private final UserRepository userRepository;
-    //BCrypt 사용
-    //PasswordEncoder 주입
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtUtil jwtUtil;
+    private final EmailVerificationRepository emailVerificationRepository;
+    private final EmailService emailService;
 
     /**
      * 로그인 비즈니스 로직
@@ -159,5 +168,104 @@ public class AuthService {
                     refreshTokenRepository.deleteAllByUser_UserId(user.getUserId())
             );
         }
+    }
+
+    /**
+     * 이메일 인증코드 발송
+     * - 기존 코드 삭제 후 새 코드 저장 (재발송 지원)
+     * - 6자리 숫자 코드, 5분 만료
+     */
+    @Transactional
+    public void sendEmailCode(String email) {
+        // 이미 가입된 이메일인지 확인
+        if (userRepository.existsByEmail(email)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 사용 중인 이메일입니다.");
+        }
+
+        // 기존 인증 레코드 삭제 (재발송 시 초기화)
+        emailVerificationRepository.deleteAllByEmail(email);
+
+        // 6자리 숫자 코드 생성
+        String code = String.format("%06d", new Random().nextInt(1_000_000));
+
+        EmailVerification verification = new EmailVerification(
+                email,
+                code,
+                LocalDateTime.now().plusMinutes(5)
+        );
+        emailVerificationRepository.save(verification);
+
+        // Amazon SES SMTP로 발송
+        emailService.sendVerificationCode(email, code);
+    }
+
+    /**
+     * 이메일 인증코드 검증
+     * - 최근 발송된 코드 조회 → 일치 + 미만료 + 미인증 확인
+     */
+    @Transactional
+    public void verifyEmailCode(String email, String code) {
+        EmailVerification verification = emailVerificationRepository
+                .findTopByEmailOrderByCreatedAtDesc(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "인증코드를 먼저 발송해주세요."));
+
+        if (!verification.isValid(code)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "인증코드가 올바르지 않거나 만료되었습니다.");
+        }
+
+        verification.markVerified();
+    }
+
+    /**
+     * 회원가입
+     * - 만 14세 이상 확인 (서버 기준 현재 날짜)
+     * - 이메일 인증 완료 여부 확인
+     * - 이메일/아이디 중복 확인
+     * - 비밀번호 BCrypt 암호화 후 저장
+     */
+    @Transactional
+    public void signUp(SignUpRequest request) {
+        // 1. 만 14세 이상 확인 (서버 현재 날짜 기준)
+        int age = Period.between(request.getBirth(), LocalDate.now()).getYears();
+        if (age < 14) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "만 14세 이상만 가입하실 수 있습니다.");
+        }
+
+        // 2. 이메일 인증 완료 여부 확인
+        EmailVerification verification = emailVerificationRepository
+                .findTopByEmailOrderByCreatedAtDesc(request.getEmail())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "이메일 인증을 먼저 완료해주세요."));
+
+        if (!verification.isVerified()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이메일 인증이 완료되지 않았습니다.");
+        }
+
+        // 3. 이메일 중복 확인
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 사용 중인 이메일입니다.");
+        }
+
+        // 4. 아이디 중복 확인
+        if (userRepository.existsByLoginId(request.getLoginId())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 사용 중인 아이디입니다.");
+        }
+
+        // 5. 비밀번호 암호화 후 유저 저장
+        User user = User.builder()
+                .name(request.getName())
+                .loginId(request.getLoginId())
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .birth(request.getBirth())
+                .phone(request.getPhone())
+                .provider(AuthProvider.LOCAL)
+                .role(UserRole.USER)
+                .isActive(true)
+                .build();
+
+        userRepository.save(user);
+
+        // 6. 사용한 인증 레코드 정리
+        emailVerificationRepository.deleteAllByEmail(request.getEmail());
     }
 }
