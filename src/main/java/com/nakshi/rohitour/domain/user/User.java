@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
  *  jpa 라이브러리가 이객체를 보고 테이블과 연결된 insert, select, update를 자동처리
  */
 @Entity
-@Table(name = "users", schema = "dbo")   // MSSQL 정확 명시
+@Table(name = "users")   // schema = "dbo" 제거 (PostgreSQL)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -80,4 +80,19 @@ public class User {
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    @Column(name = "agreed_terms_at")
+    private LocalDateTime agreedTermsAt;
+
+    @Column(name = "agreed_privacy_at")
+    private LocalDateTime agreedPrivacyAt;
+
+    @Column(name = "agreed_third_party_at")
+    private LocalDateTime agreedThirdPartyAt;
+
+    @Column(name = "marketing_agreed")
+    private Boolean marketingAgreed;
+
+    @Column(name = "marketing_agreed_at")
+    private LocalDateTime marketingAgreedAt;
 }

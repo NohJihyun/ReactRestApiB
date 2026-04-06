@@ -1,5 +1,6 @@
 package com.nakshi.rohitour.repository.user;
 
+import com.nakshi.rohitour.domain.user.AuthProvider;
 import com.nakshi.rohitour.domain.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -14,7 +15,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
     //NPE 예방처리 NULL 대신 Optional 컨테이너 돌려준다.
     Optional<User> findByEmail(String email);
 
+    Optional<User> findByLoginId(String loginId);
+
     boolean existsByEmail(String email);
 
     boolean existsByLoginId(String loginId);
+
+    Optional<User> findByNameAndPhone(String name, String phone);
+
+    Optional<User> findByProviderAndProviderId(AuthProvider provider, String providerId);
 }

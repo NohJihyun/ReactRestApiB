@@ -1,13 +1,17 @@
 package com.nakshi.rohitour.service.auth;
 
 import com.nakshi.rohitour.config.JwtUtil;
+import com.nakshi.rohitour.domain.auth.PasswordResetToken;
 import com.nakshi.rohitour.domain.email.EmailVerification;
 import com.nakshi.rohitour.domain.user.AuthProvider;
 import com.nakshi.rohitour.domain.user.User;
 import com.nakshi.rohitour.domain.user.UserRole;
 import com.nakshi.rohitour.dto.LoginResponse;
+import com.nakshi.rohitour.dto.PasswordResetRequest;
+import com.nakshi.rohitour.dto.PasswordResetSendRequest;
 import com.nakshi.rohitour.dto.ReissueResponse;
 import com.nakshi.rohitour.dto.SignUpRequest;
+import com.nakshi.rohitour.repository.auth.PasswordResetTokenRepository;
 import com.nakshi.rohitour.repository.auth.RefreshTokenRepository;
 import com.nakshi.rohitour.repository.email.EmailVerificationRepository;
 import com.nakshi.rohitour.repository.user.UserRepository;
@@ -15,6 +19,7 @@ import com.nakshi.rohitour.service.email.EmailService;
 import com.nakshi.rohitour.util.TokenHashUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.nakshi.rohitour.domain.user.auth.RefreshToken;
@@ -22,6 +27,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
 import java.util.Random;
+import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -35,6 +41,10 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final EmailVerificationRepository emailVerificationRepository;
     private final EmailService emailService;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
+
+    @Value("${app.frontend.url:http://localhost:3000}")
+    private String frontendUrl;
 
     /**
      * 로그인 비즈니스 로직
@@ -45,13 +55,13 @@ public class AuthService {
     @Transactional
     public LoginResponse login(String email, String password) {
 
-        // 1️ 사용자 조회
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "존재하지 않는 이메일입니다."));
+        // 1️ 사용자 조회 (loginId로 검색)
+        User user = userRepository.findByLoginId(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "아이디 또는 비밀번호가 올바르지 않습니다."));
 
         // 2️ 비밀번호 검증
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"비밀번호가 일치하지 않습니다.");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "아이디 또는 비밀번호가 올바르지 않습니다.");
         }
 
         // 3️ 계정 활성 여부
@@ -179,7 +189,7 @@ public class AuthService {
     public void sendEmailCode(String email) {
         // 이미 가입된 이메일인지 확인
         if (userRepository.existsByEmail(email)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 사용 중인 이메일입니다.");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 사용된 인증 이메일입니다.");
         }
 
         // 기존 인증 레코드 삭제 (재발송 시 초기화)
@@ -225,7 +235,18 @@ public class AuthService {
      */
     @Transactional
     public void signUp(SignUpRequest request) {
-        // 1. 만 14세 이상 확인 (서버 현재 날짜 기준)
+        // 1. 필수 약관 동의 확인
+        if (!Boolean.TRUE.equals(request.getAgreedTerms())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이용약관에 동의해주세요.");
+        }
+        if (!Boolean.TRUE.equals(request.getAgreedPrivacy())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "개인정보 수집 및 이용에 동의해주세요.");
+        }
+        if (!Boolean.TRUE.equals(request.getAgreedThirdParty())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "개인정보 제3자 제공에 동의해주세요.");
+        }
+
+        // 2. 만 14세 이상 확인 (서버 현재 날짜 기준)
         int age = Period.between(request.getBirth(), LocalDate.now()).getYears();
         if (age < 14) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "만 14세 이상만 가입하실 수 있습니다.");
@@ -242,15 +263,17 @@ public class AuthService {
 
         // 3. 이메일 중복 확인
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 사용 중인 이메일입니다.");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "인증하시는 이메일이 이미 사용 중입니다.");
         }
 
         // 4. 아이디 중복 확인
         if (userRepository.existsByLoginId(request.getLoginId())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 사용 중인 아이디입니다.");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "작성 중인 아이디 이메일이 이미 사용 중입니다.");
         }
 
         // 5. 비밀번호 암호화 후 유저 저장
+        LocalDateTime now = LocalDateTime.now();
+        boolean marketingAgreed = Boolean.TRUE.equals(request.getMarketingAgreed());
         User user = User.builder()
                 .name(request.getName())
                 .loginId(request.getLoginId())
@@ -261,11 +284,87 @@ public class AuthService {
                 .provider(AuthProvider.LOCAL)
                 .role(UserRole.USER)
                 .isActive(true)
+                .agreedTermsAt(now)
+                .agreedPrivacyAt(now)
+                .agreedThirdPartyAt(now)
+                .marketingAgreed(marketingAgreed)
+                .marketingAgreedAt(marketingAgreed ? now : null)
                 .build();
 
         userRepository.save(user);
 
         // 6. 사용한 인증 레코드 정리
         emailVerificationRepository.deleteAllByEmail(request.getEmail());
+    }
+
+    /**
+     * 아이디 찾기 - 이름 + 휴대폰으로 loginId 조회
+     */
+    public String findLoginId(String name, String phone) {
+        User user = userRepository.findByNameAndPhone(name, phone)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "일치하는 회원 정보가 없습니다."));
+        return user.getLoginId();
+    }
+
+    /**
+     * 비밀번호 재설정 이메일 발송
+     * - loginId + 이름 + 휴대폰으로 본인 확인
+     * - 확인되면 등록된 이메일로 재설정 링크 발송
+     */
+    @Transactional
+    public void sendPasswordReset(PasswordResetSendRequest request) {
+        // 1. loginId로 사용자 조회
+        User user = userRepository.findByLoginId(request.getLoginId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "일치하는 회원 정보가 없습니다."));
+
+        // 2. 이름 + 휴대폰 일치 확인
+        if (!request.getName().equals(user.getName()) || !request.getPhone().equals(user.getPhone())) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "일치하는 회원 정보가 없습니다.");
+        }
+
+        // 3. 계정 활성 여부 확인
+        if (!Boolean.TRUE.equals(user.getIsActive())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "비활성화된 계정입니다.");
+        }
+
+        // 4. 기존 재설정 토큰 삭제
+        passwordResetTokenRepository.deleteAllByUser_UserId(user.getUserId());
+
+        // 5. UUID 토큰 생성 → SHA-256 해시 저장
+        String rawToken = UUID.randomUUID().toString();
+        String hash = TokenHashUtil.sha256(rawToken);
+
+        PasswordResetToken resetToken = new PasswordResetToken(
+                hash,
+                user,
+                LocalDateTime.now().plusMinutes(30)
+        );
+        passwordResetTokenRepository.save(resetToken);
+
+        // 6. 이메일 발송
+        String resetLink = frontendUrl + "/password-reset?token=" + rawToken;
+        emailService.sendPasswordResetLink(user.getEmail(), resetLink);
+    }
+
+    /**
+     * 비밀번호 재설정
+     * - 토큰 검증 → 새 비밀번호 저장
+     */
+    @Transactional
+    public void resetPassword(PasswordResetRequest request) {
+        String hash = TokenHashUtil.sha256(request.getToken());
+
+        PasswordResetToken resetToken = passwordResetTokenRepository.findByTokenHash(hash)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "유효하지 않은 링크입니다."));
+
+        if (!resetToken.isValid()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "만료되었거나 이미 사용된 링크입니다.");
+        }
+
+        User user = resetToken.getUser();
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+
+        resetToken.markUsed();
     }
 }

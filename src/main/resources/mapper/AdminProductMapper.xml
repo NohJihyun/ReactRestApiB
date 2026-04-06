@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.nakshi.rohitour.repository.admin.AdminProductMapper">
+
+    <resultMap id="ProductMap" type="com.nakshi.rohitour.dto.ProductDto">
+        <id  property="productId"       column="product_id"/>
+        <result property="categoryId"      column="category_id"/>
+        <result property="categoryName"    column="category_name"/>
+        <result property="productCode"     column="product_code"/>
+        <result property="productName"     column="product_name"/>
+        <result property="productSubname"  column="product_subname"/>
+        <result property="summary"         column="summary"/>
+        <result property="description"     column="description"/>
+        <result property="thumbnailUrl"    column="thumbnail_url"/>
+        <result property="status"          column="status"/>
+        <result property="isFeatured"      column="is_featured"/>
+        <result property="isActive"        column="is_active"/>
+        <result property="exposureStartAt" column="exposure_start_at"/>
+        <result property="exposureEndAt"   column="exposure_end_at"/>
+        <result property="seoTitle"        column="seo_title"/>
+        <result property="seoDescription"  column="seo_description"/>
+        <result property="viewCount"       column="view_count"/>
+        <result property="createdBy"       column="created_by"/>
+        <result property="updatedBy"       column="updated_by"/>
+        <result property="createdAt"       column="created_at"/>
+        <result property="updatedAt"       column="updated_at"/>
+    </resultMap>
+
+    <!-- 목록 + 검색 + 페이지네이션 -->
+    <select id="findAll" resultMap="ProductMap">
+        SELECT
+            p.product_id,
+            p.category_id,
+            c.category_name,
+            p.product_code,
+            p.product_name,
+            p.product_subname,
+            p.summary,
+            p.description,
+            p.thumbnail_url,
+            p.status,
+            p.is_featured,
+            p.is_active,
+            p.exposure_start_at,
+            p.exposure_end_at,
+            p.seo_title,
+            p.seo_description,
+            p.view_count,
+            p.created_by,
+            p.updated_by,
+            p.created_at,
+            p.updated_at
+        FROM products p
+        LEFT JOIN categories c ON p.category_id = c.category_id
+        <where>
+            <if test="search.categoryId != null">
+                AND p.category_id = #{search.categoryId}
+            </if>
+            <if test="search.status != null and search.status != ''">
+                AND p.status = #{search.status}
+            </if>
+            <if test="search.isFeatured != null and search.isFeatured != ''">
+                AND p.is_featured = #{search.isFeatured}
+            </if>
+            <if test="search.isActive != null and search.isActive != ''">
+                AND p.is_active = #{search.isActive}
+            </if>
+            <if test="search.keyword != null and search.keyword != ''">
+                AND (
+                    p.product_name LIKE '%' || #{search.keyword} || '%'
+                    OR p.product_code LIKE '%' || #{search.keyword} || '%'
+                )
+            </if>
+        </where>
+        ORDER BY p.created_at DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <!-- 페이지네이션 카운트 -->
+    <select id="countAll" resultType="int">
+        SELECT COUNT(*)
+        FROM products p
+        <where>
+            <if test="search.categoryId != null">
+                AND p.category_id = #{search.categoryId}
+            </if>
+            <if test="search.status != null and search.status != ''">
+                AND p.status = #{search.status}
+            </if>
+            <if test="search.isFeatured != null and search.isFeatured != ''">
+                AND p.is_featured = #{search.isFeatured}
+            </if>
+            <if test="search.isActive != null and search.isActive != ''">
+                AND p.is_active = #{search.isActive}
+            </if>
+            <if test="search.keyword != null and search.keyword != ''">
+                AND (
+                    p.product_name LIKE '%' || #{search.keyword} || '%'
+                    OR p.product_code LIKE '%' || #{search.keyword} || '%'
+                )
+            </if>
+        </where>
+    </select>
+
+    <!-- 상품코드 중복 체크 -->
+    <select id="countByCode" resultType="int">
+        SELECT COUNT(*)
+        FROM products
+        WHERE product_code = #{productCode}
+        <if test="excludeId != null">
+            AND product_id <![CDATA[<>]]> #{excludeId}
+        </if>
+    </select>
+
+    <!-- 등록 -->
+    <insert id="insert" parameterType="com.nakshi.rohitour.dto.ProductDto">
+        INSERT INTO products (
+            category_id,
+            product_code,
+            product_name,
+            product_subname,
+            summary,
+            description,
+            thumbnail_url,
+            status,
+            is_featured,
+            is_active,
+            exposure_start_at,
+            exposure_end_at,
+            seo_title,
+            seo_description,
+            created_by,
+            updated_by,
+            created_at,
+            updated_at
+        ) VALUES (
+            #{categoryId},
+            #{productCode},
+            #{productName},
+            #{productSubname},
+            #{summary},
+            #{description},
+            #{thumbnailUrl},
+            #{status},
+            #{isFeatured},
+            #{isActive},
+            #{exposureStartAt},
+            #{exposureEndAt},
+            #{seoTitle},
+            #{seoDescription},
+            #{createdBy},
+            #{updatedBy},
+            NOW(),
+            NOW()
+        )
+    </insert>
+
+    <!-- 수정 (product_code는 변경 불가) -->
+    <update id="update" parameterType="com.nakshi.rohitour.dto.ProductDto">
+        UPDATE products
+        SET
+            category_id       = #{categoryId},
+            product_name      = #{productName},
+            product_subname   = #{productSubname},
+            summary           = #{summary},
+            description       = #{description},
+            thumbnail_url     = #{thumbnailUrl},
+            status            = #{status},
+            is_featured       = #{isFeatured},
+            is_active         = #{isActive},
+            exposure_start_at = #{exposureStartAt},
+            exposure_end_at   = #{exposureEndAt},
+            seo_title         = #{seoTitle},
+            seo_description   = #{seoDescription},
+            updated_by        = #{updatedBy},
+            updated_at        = NOW()
+        WHERE product_id = #{productId}
+    </update>
+
+    <!-- 논리 삭제 (비활성화) -->
+    <update id="deactivate" parameterType="long">
+        UPDATE products
+        SET
+            is_active  = 'N',
+            updated_at = NOW()
+        WHERE product_id = #{id}
+          AND is_active = 'Y'
+    </update>
+
+    <!-- 물리 삭제 -->
+    <delete id="delete" parameterType="long">
+        DELETE FROM products
+        WHERE product_id = #{id}
+    </delete>
+
+</mapper>

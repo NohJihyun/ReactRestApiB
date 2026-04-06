@@ -55,8 +55,8 @@
 
             <if test="search.keyword != null and search.keyword != ''">
                 AND (
-                category_name LIKE '%' + #{search.keyword} + '%'
-                OR category_code LIKE '%' + #{search.keyword} + '%'
+                category_name LIKE '%' || #{search.keyword} || '%'
+                OR category_code LIKE '%' || #{search.keyword} || '%'
                 )
             </if>
         </where>
@@ -66,8 +66,7 @@
         depth ASC,
         sort_order ASC
 
-        OFFSET #{offset} ROWS
-        FETCH NEXT #{size} ROWS ONLY
+        LIMIT #{size} OFFSET #{offset}
     </select>
 
     <!-- 페이지네이션 카운트 -->
@@ -89,8 +88,8 @@
 
             <if test="search.keyword != null and search.keyword != ''">
                 AND (
-                category_name LIKE '%' + #{search.keyword} + '%'
-                OR category_code LIKE '%' + #{search.keyword} + '%'
+                category_name LIKE '%' || #{search.keyword} || '%'
+                OR category_code LIKE '%' || #{search.keyword} || '%'
                 )
             </if>
         </where>
@@ -113,8 +112,8 @@
              #{depth},
              #{sortOrder},
              #{isActive},
-             GETDATE(),
-             GETDATE()
+             NOW(),
+             NOW()
                  )
     </insert>
 
@@ -124,7 +123,7 @@
             category_name = #{categoryName},
             sort_order    = #{sortOrder},
             is_active     = #{isActive},
-            updated_at    = GETDATE()
+            updated_at    = NOW()
         WHERE category_id = #{categoryId}
     </update>
 
@@ -133,7 +132,7 @@
         UPDATE categories
         SET
             is_active  = 'N',
-            updated_at = GETDATE()
+            updated_at = NOW()
         WHERE category_id = #{id}
           AND is_active = 'Y'
     </update>
