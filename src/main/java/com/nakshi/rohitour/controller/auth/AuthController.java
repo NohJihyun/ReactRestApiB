@@ -2,12 +2,16 @@ package com.nakshi.rohitour.controller.auth;
 
 import com.nakshi.rohitour.config.JwtUtil;
 import com.nakshi.rohitour.domain.user.User;
+import com.nakshi.rohitour.dto.FindLoginIdRequest;
 import com.nakshi.rohitour.dto.LoginRequest;
 import com.nakshi.rohitour.dto.LoginResponse;
+import com.nakshi.rohitour.dto.PasswordResetRequest;
+import com.nakshi.rohitour.dto.PasswordResetSendRequest;
 import com.nakshi.rohitour.dto.ReissueResponse;
 import com.nakshi.rohitour.dto.SendEmailCodeRequest;
 import com.nakshi.rohitour.dto.SignUpRequest;
 import com.nakshi.rohitour.dto.VerifyEmailCodeRequest;
+import java.util.Map;
 import com.nakshi.rohitour.service.auth.AuthService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -155,6 +159,36 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<Void> signUp(@Valid @RequestBody SignUpRequest request) {
         authService.signUp(request);
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * 아이디 찾기 - 이름 + 휴대폰으로 loginId 반환
+     * POST /api/auth/find-id
+     */
+    @PostMapping("/find-id")
+    public ResponseEntity<Map<String, String>> findLoginId(@Valid @RequestBody FindLoginIdRequest request) {
+        String loginId = authService.findLoginId(request.getName(), request.getPhone());
+        return ResponseEntity.ok(Map.of("loginId", loginId));
+    }
+
+    /**
+     * 비밀번호 재설정 이메일 발송
+     * POST /api/auth/password/send
+     */
+    @PostMapping("/password/send")
+    public ResponseEntity<Void> sendPasswordReset(@Valid @RequestBody PasswordResetSendRequest request) {
+        authService.sendPasswordReset(request);
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * 비밀번호 재설정
+     * POST /api/auth/password/reset
+     */
+    @PostMapping("/password/reset")
+    public ResponseEntity<Void> resetPassword(@Valid @RequestBody PasswordResetRequest request) {
+        authService.resetPassword(request);
         return ResponseEntity.ok().build();
     }
 

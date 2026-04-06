@@ -31,3 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### 민감 정보 (DB 비밀번호, JWT 시크릿 등 포함) ###
+src/main/resources/application.properties
+src/main/resources/application-*.properties
+!src/main/resources/application-example.properties

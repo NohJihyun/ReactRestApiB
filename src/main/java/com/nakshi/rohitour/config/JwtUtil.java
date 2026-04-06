@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.UUID;
 /*
  *  ✔ JWT 생성
  *  ✔ JWT 파싱
@@ -49,6 +50,7 @@ public class JwtUtil {
 
         return Jwts.builder()
                 .setSubject(email)
+                .setId(UUID.randomUUID().toString())  // 동시 요청 시 동일 토큰 생성 방지
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + refreshExpiration))
                 .signWith(key, SignatureAlgorithm.HS256)

@@ -1,5 +1,8 @@
 package com.nakshi.rohitour.config;
 
+import com.nakshi.rohitour.config.oauth2.CustomOAuth2UserService;
+import com.nakshi.rohitour.config.oauth2.OAuth2AuthenticationFailureHandler;
+import com.nakshi.rohitour.config.oauth2.OAuth2AuthenticationSuccessHandler;
 import com.nakshi.rohitour.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -8,7 +11,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -34,11 +36,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    //private final JwtUtil jwtUtil;
-    // JWT 필터 주입
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    //
     private final SecurityErrorHandler securityErrorHandler;
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+    private final
+    OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -47,7 +50,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) //추가
                 .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                        session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 )
                 .authorizeHttpRequests(auth -> auth
                         // 컨트롤러 경로에 정확히 맞춤
@@ -57,28 +60,34 @@ public class SecurityConfig {
                                 "/api/auth/logout",
                                 "/api/auth/signup",
                                 "/api/auth/email/send",
-                                "/api/auth/email/verify"
+                                "/api/auth/email/verify",
+                                "/api/auth/find-id",
+                                "/api/auth/password/send",
+                                "/api/auth/password/reset"
                         ).permitAll()
 
-                        // 예: 관리자
+                        // 관리자 API
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
 
                         .anyRequest().authenticated()
                 )
-                // 여기 추가: 401/403 응답 포맷 통일
+                // 401/403 응답 포맷 통일
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(securityErrorHandler)
                         .accessDeniedHandler(securityErrorHandler)
                 )
-                // new로 생성하지 말고, 주입된 Bean 사용
+                // 네이버 소셜 로그인
+                .oauth2Login(oauth2 -> oauth2
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService)
+                        )
+                        .successHandler(oAuth2AuthenticationSuccessHandler)
+                        .failureHandler(oAuth2AuthenticationFailureHandler)
+                )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 
     @Bean
