@@ -6,6 +6,7 @@ import com.nakshi.rohitour.domain.email.EmailVerification;
 import com.nakshi.rohitour.domain.user.AuthProvider;
 import com.nakshi.rohitour.domain.user.User;
 import com.nakshi.rohitour.domain.user.UserRole;
+import com.nakshi.rohitour.dto.AgreeTermsRequest;
 import com.nakshi.rohitour.dto.LoginResponse;
 import com.nakshi.rohitour.dto.PasswordResetRequest;
 import com.nakshi.rohitour.dto.PasswordResetSendRequest;
@@ -298,10 +299,38 @@ public class AuthService {
     }
 
     /**
+     * 소셜 로그인 신규 사용자 약관 동의 처리
+     */
+    @Transactional
+    public void agreeTerms(String email, AgreeTermsRequest request) {
+        if (!Boolean.TRUE.equals(request.getAgreedTerms())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이용약관에 동의해주세요.");
+        }
+        if (!Boolean.TRUE.equals(request.getAgreedPrivacy())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "개인정보 수집 및 이용에 동의해주세요.");
+        }
+        if (!Boolean.TRUE.equals(request.getAgreedThirdParty())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "개인정보 제3자 제공에 동의해주세요.");
+        }
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."));
+
+        LocalDateTime now = LocalDateTime.now();
+        user.setAgreedTermsAt(now);
+        user.setAgreedPrivacyAt(now);
+        user.setAgreedThirdPartyAt(now);
+        boolean marketing = Boolean.TRUE.equals(request.getMarketingAgreed());
+        user.setMarketingAgreed(marketing);
+        user.setMarketingAgreedAt(marketing ? now : null);
+        userRepository.save(user);
+    }
+
+    /**
      * 아이디 찾기 - 이름 + 휴대폰으로 loginId 조회
      */
     public String findLoginId(String name, String phone) {
-        User user = userRepository.findByNameAndPhone(name, phone)
+        User user = userRepository.findByNameAndPhoneAndProvider(name, phone, AuthProvider.LOCAL)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "일치하는 회원 정보가 없습니다."));
         return user.getLoginId();
     }

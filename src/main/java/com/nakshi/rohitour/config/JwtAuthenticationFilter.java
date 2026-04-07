@@ -51,39 +51,36 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
-        // 이미 인증이 세팅돼 있으면 중복 세팅 안 함(안정성)
-        if (SecurityContextHolder.getContext().getAuthentication() != null) {
+        String header = request.getHeader("Authorization");
+
+        // Bearer 토큰이 없으면 기존 인증(세션 등) 유지
+        if (header == null || !header.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        String header = request.getHeader("Authorization");
+        // Bearer 토큰이 있으면 JWT가 우선 → OAuth2 세션 인증을 덮어씀
+        String token = header.substring(7);
 
-        if (header != null && header.startsWith("Bearer ")) {
+        if (jwtUtil.validateToken(token)) {
+            String username = jwtUtil.extractUsername(token);
+            String role = jwtUtil.extractRole(token);
 
-            String token = header.substring(7);
+            List<SimpleGrantedAuthority> authorities =
+                    List.of(new SimpleGrantedAuthority("ROLE_" + role));
 
-            if (jwtUtil.validateToken(token)) {
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(
+                            username,
+                            null,
+                            authorities
+                    );
 
-                String username = jwtUtil.extractUsername(token);
-                String role = jwtUtil.extractRole(token);
+            authentication.setDetails(
+                    new WebAuthenticationDetailsSource().buildDetails(request)
+            );
 
-                List<SimpleGrantedAuthority> authorities =
-                        List.of(new SimpleGrantedAuthority("ROLE_" + role));
-
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(
-                                username,
-                                null,
-                                authorities
-                        );
-
-                authentication.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request)
-                );
-
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            }
+            SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 
         filterChain.doFilter(request, response);

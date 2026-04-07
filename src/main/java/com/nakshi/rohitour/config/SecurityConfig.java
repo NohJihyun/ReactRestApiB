@@ -1,5 +1,6 @@
 package com.nakshi.rohitour.config;
 
+import com.nakshi.rohitour.config.oauth2.CustomAuthorizationRequestResolver;
 import com.nakshi.rohitour.config.oauth2.CustomOAuth2UserService;
 import com.nakshi.rohitour.config.oauth2.OAuth2AuthenticationFailureHandler;
 import com.nakshi.rohitour.config.oauth2.OAuth2AuthenticationSuccessHandler;
@@ -12,6 +13,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -40,8 +42,8 @@ public class SecurityConfig {
     private final SecurityErrorHandler securityErrorHandler;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
-    private final
-    OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
+    private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
+    private final ClientRegistrationRepository clientRegistrationRepository;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -79,6 +81,10 @@ public class SecurityConfig {
                 )
                 // 네이버 소셜 로그인
                 .oauth2Login(oauth2 -> oauth2
+                        .authorizationEndpoint(endpoint -> endpoint
+                                .authorizationRequestResolver(
+                                        new CustomAuthorizationRequestResolver(clientRegistrationRepository))
+                        )
                         .userInfoEndpoint(userInfo -> userInfo
                                 .userService(customOAuth2UserService)
                         )

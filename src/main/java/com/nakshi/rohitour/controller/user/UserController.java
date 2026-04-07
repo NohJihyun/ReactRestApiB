@@ -1,19 +1,22 @@
 package com.nakshi.rohitour.controller.user;
 
+import com.nakshi.rohitour.dto.AgreeTermsRequest;
+import com.nakshi.rohitour.service.auth.AuthService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-/*
- * 사용자 확인
- * 현재 로그인한 사용자의 정보를 조회하는 API
- * /api/users/me
- * 현재 로그인된 사용자 정보 반환
- */
+
 @RestController
 @RequestMapping("/api/users")
+@RequiredArgsConstructor
 public class UserController {
+
+    private final AuthService authService;
 
     @GetMapping("/me")
     public MeResponse me(Authentication authentication) {
@@ -30,6 +33,18 @@ public class UserController {
                 .orElse("USER");
 
         return new MeResponse(email, role);
+    }
+
+    /**
+     * 소셜 로그인 신규 사용자 약관 동의
+     * POST /api/users/terms
+     */
+    @PostMapping("/terms")
+    public ResponseEntity<Void> agreeTerms(
+            @Valid @RequestBody AgreeTermsRequest request,
+            Authentication authentication) {
+        authService.agreeTerms(authentication.getName(), request);
+        return ResponseEntity.ok().build();
     }
 
     public record MeResponse(String email, String role) {}
