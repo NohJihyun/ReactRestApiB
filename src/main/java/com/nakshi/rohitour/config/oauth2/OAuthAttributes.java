@@ -32,6 +32,9 @@ public class OAuthAttributes {
         if ("kakao".equals(registrationId)) {
             return ofKakao(attributes);
         }
+        if ("google".equals(registrationId)) {
+            return ofGoogle(userNameAttributeName, attributes);
+        }
         throw new IllegalArgumentException("지원하지 않는 소셜 로그인: " + registrationId);
     }
 
@@ -97,6 +100,29 @@ public class OAuthAttributes {
         attrs.phone = null;  // 카카오 전화번호는 비즈앱 전용
         attrs.providerId = providerId;
         attrs.provider = AuthProvider.KAKAO;
+        return attrs;
+    }
+
+    /**
+     * 구글 응답 형식:
+     * {
+     *   "sub": "123456789",
+     *   "email": "user@gmail.com",
+     *   "name": "홍길동",
+     *   "email_verified": true
+     * }
+     * → userNameAttributeName = "sub"
+     * → 전화번호 제공 안 함
+     */
+    private static OAuthAttributes ofGoogle(String userNameAttributeName, Map<String, Object> attributes) {
+        OAuthAttributes attrs = new OAuthAttributes();
+        attrs.attributes = attributes;
+        attrs.nameAttributeKey = userNameAttributeName;  // "sub"
+        attrs.name = (String) attributes.get("name");
+        attrs.email = (String) attributes.get("email");
+        attrs.phone = null;
+        attrs.providerId = (String) attributes.get("sub");
+        attrs.provider = AuthProvider.GOOGLE;
         return attrs;
     }
 

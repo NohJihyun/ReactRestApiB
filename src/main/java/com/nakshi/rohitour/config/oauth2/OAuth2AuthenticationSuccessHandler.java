@@ -70,11 +70,15 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         refreshCookie.setMaxAge(60 * 60 * 24 * 7);
         response.addCookie(refreshCookie);
 
+        // 신규 사용자(약관 미동의)이면 needsTerms=true 전달
+        boolean needsTerms = user.getAgreedTermsAt() == null;
+
         // 프론트엔드로 리다이렉트 (AccessToken을 URL 파라미터로 전달)
         String redirectUrl = frontendUrl + "/oauth/callback"
                 + "?token=" + URLEncoder.encode(accessToken, StandardCharsets.UTF_8)
                 + "&email=" + URLEncoder.encode(user.getEmail(), StandardCharsets.UTF_8)
-                + "&role=" + user.getRole().name();
+                + "&role=" + user.getRole().name()
+                + (needsTerms ? "&needsTerms=true" : "");
 
         getRedirectStrategy().sendRedirect(request, response, redirectUrl);
     }
