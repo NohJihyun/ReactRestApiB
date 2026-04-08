@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.nakshi.rohitour.repository.admin.AdminProductFileMapper">
+
+    <resultMap id="FileMap" type="com.nakshi.rohitour.dto.ProductFileDto">
+        <id  property="id"          column="id"/>
+        <result property="productId"  column="product_id"/>
+        <result property="filePath"   column="file_path"/>
+        <result property="fileName"   column="file_name"/>
+        <result property="fileType"   column="file_type"/>
+        <result property="fileSize"   column="file_size"/>
+        <result property="sortOrder"  column="sort_order"/>
+        <result property="createdAt"  column="created_at"/>
+    </resultMap>
+
+    <!-- 상품의 전체 첨부파일 목록 -->
+    <select id="findByProductId" resultMap="FileMap">
+        SELECT id, product_id, file_path, file_name, file_type, file_size, sort_order, created_at
+        FROM product_files
+        WHERE product_id = #{productId}
+        ORDER BY sort_order ASC, created_at ASC
+    </select>
+
+    <!-- 단건 조회 -->
+    <select id="findById" resultMap="FileMap">
+        SELECT id, product_id, file_path, file_name, file_type, file_size, sort_order, created_at
+        FROM product_files
+        WHERE id = #{id}
+    </select>
+
+    <!-- 파일 개수 (sortOrder 계산용) -->
+    <select id="countByProductId" resultType="int">
+        SELECT COUNT(*) FROM product_files WHERE product_id = #{productId}
+    </select>
+
+    <!-- 등록 -->
+    <insert id="insert" parameterType="com.nakshi.rohitour.dto.ProductFileDto"
+            useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO product_files (product_id, file_path, file_name, file_type, file_size, sort_order, created_at)
+        VALUES (#{productId}, #{filePath}, #{fileName}, #{fileType}, #{fileSize}, #{sortOrder}, NOW())
+    </insert>
+
+    <!-- 삭제 -->
+    <delete id="delete" parameterType="long">
+        DELETE FROM product_files WHERE id = #{id}
+    </delete>
+
+</mapper>

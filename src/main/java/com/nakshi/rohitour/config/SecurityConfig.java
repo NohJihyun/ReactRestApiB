@@ -68,6 +68,12 @@ public class SecurityConfig {
                                 "/api/auth/password/reset"
                         ).permitAll()
 
+                        // 업로드 파일 공개 접근
+                        .requestMatchers("/uploads/**").permitAll()
+
+                        // 클라이언트 공개 상품 API
+                        .requestMatchers("/api/products/**").permitAll()
+
                         // 관리자 API
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/admin/**").hasRole("ADMIN")

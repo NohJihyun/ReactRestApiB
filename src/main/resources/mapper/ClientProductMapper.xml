@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.nakshi.rohitour.repository.client.ClientProductMapper">
+
+    <resultMap id="ClientProductMap" type="com.nakshi.rohitour.dto.ProductDto">
+        <id  property="productId"      column="product_id"/>
+        <result property="categoryId"     column="category_id"/>
+        <result property="categoryName"   column="category_name"/>
+        <result property="productCode"    column="product_code"/>
+        <result property="productName"    column="product_name"/>
+        <result property="productSubname" column="product_subname"/>
+        <result property="summary"        column="summary"/>
+        <result property="status"         column="status"/>
+        <result property="isFeatured"     column="is_featured"/>
+        <result property="travelType"     column="travel_type"/>
+        <result property="minPeople"      column="min_people"/>
+        <result property="maxPeople"      column="max_people"/>
+        <result property="pricePerPerson" column="price_per_person"/>
+        <result property="videoPath"      column="video_path"/>
+        <result property="videoUrl"       column="video_url"/>
+        <result property="thumbnailPath"  column="thumbnail_path"/>
+        <result property="imageCount"     column="image_count"/>
+        <result property="fileCount"      column="file_count"/>
+        <result property="createdAt"      column="created_at"/>
+    </resultMap>
+
+    <!--
+        대분류 카테고리명으로 게시중·활성 상품 조회
+        - depth=1 카테고리명(예: 수학여행)으로 그 하위 소분류 상품 포함 전체 조회
+        - 추천 상품 우선, 이후 등록일 내림차순
+    -->
+    <select id="findPublishedByRootCategory" resultMap="ClientProductMap">
+        SELECT
+            p.product_id,
+            p.category_id,
+            c.category_name,
+            p.product_code,
+            p.product_name,
+            p.product_subname,
+            p.summary,
+            p.status,
+            p.is_featured,
+            p.travel_type,
+            p.min_people,
+            p.max_people,
+            p.price_per_person,
+            p.video_path,
+            p.video_url,
+            p.created_at,
+            thumb.image_path                                                               AS thumbnail_path,
+            (SELECT COUNT(*) FROM product_images pi WHERE pi.product_id = p.product_id)   AS image_count,
+            (SELECT COUNT(*) FROM product_files  pf WHERE pf.product_id = p.product_id)   AS file_count
+        FROM products p
+        LEFT JOIN categories c     ON p.category_id = c.category_id
+        LEFT JOIN categories root  ON (
+            (c.depth = 1 AND c.category_id = root.category_id)
+            OR
+            (c.depth = 2 AND c.parent_id = root.category_id)
+        )
+        LEFT JOIN product_images thumb ON thumb.product_id = p.product_id
+                                      AND thumb.image_type = 'THUMBNAIL'
+        WHERE p.status    = 'PUBLISHED'
+          AND p.is_active = 'Y'
+          AND root.category_name = #{categoryName}
+          AND root.depth         = 1
+        ORDER BY p.is_featured DESC, p.created_at DESC
+    </select>
+
+</mapper>

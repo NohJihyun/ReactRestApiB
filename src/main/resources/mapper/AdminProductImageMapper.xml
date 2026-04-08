@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.nakshi.rohitour.repository.admin.AdminProductImageMapper">
+
+    <resultMap id="ImageMap" type="com.nakshi.rohitour.dto.ProductImageDto">
+        <id  property="id"          column="id"/>
+        <result property="productId"  column="product_id"/>
+        <result property="imagePath"  column="image_path"/>
+        <result property="imageType"  column="image_type"/>
+        <result property="sortOrder"  column="sort_order"/>
+        <result property="createdAt"  column="created_at"/>
+    </resultMap>
+
+    <!-- 상품의 전체 이미지 목록 (정렬순) -->
+    <select id="findByProductId" resultMap="ImageMap">
+        SELECT id, product_id, image_path, image_type, sort_order, created_at
+        FROM product_images
+        WHERE product_id = #{productId}
+        ORDER BY image_type DESC, sort_order ASC
+    </select>
+
+    <!-- 썸네일 조회 -->
+    <select id="findThumbnail" resultMap="ImageMap">
+        SELECT id, product_id, image_path, image_type, sort_order, created_at
+        FROM product_images
+        WHERE product_id = #{productId}
+          AND image_type = 'THUMBNAIL'
+        LIMIT 1
+    </select>
+
+    <!-- 상세이미지 개수 (다음 sortOrder 계산용) -->
+    <select id="countDetail" resultType="int">
+        SELECT COUNT(*)
+        FROM product_images
+        WHERE product_id = #{productId}
+          AND image_type = 'DETAIL'
+    </select>
+
+    <!-- 등록 -->
+    <insert id="insert" parameterType="com.nakshi.rohitour.dto.ProductImageDto"
+            useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO product_images (product_id, image_path, image_type, sort_order, created_at)
+        VALUES (#{productId}, #{imagePath}, #{imageType}, #{sortOrder}, NOW())
+    </insert>
+
+    <!-- 삭제 -->
+    <delete id="delete" parameterType="long">
+        DELETE FROM product_images WHERE id = #{id}
+    </delete>
+
+    <!-- 순서 변경 -->
+    <update id="updateOrder">
+        UPDATE product_images
+        SET sort_order = #{sortOrder}
+        WHERE id = #{id}
+    </update>
+
+</mapper>

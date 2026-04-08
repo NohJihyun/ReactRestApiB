@@ -23,9 +23,17 @@ public interface AdminProductMapper {
             @Param("excludeId") Long excludeId
     );
 
+    ProductDto findById(@Param("id") Long id);
+
     int insert(ProductDto dto);
 
     int update(ProductDto dto);
+
+    int updateVideoUrl(@Param("productId") Long productId, @Param("videoUrl") String videoUrl);
+
+    int updateVideoPath(@Param("productId") Long productId, @Param("videoPath") String videoPath);
+
+    int clearVideo(@Param("productId") Long productId);
 
     int deactivate(Long id);
 
