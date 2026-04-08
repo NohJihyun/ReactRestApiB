@@ -23,6 +23,15 @@
         <result property="seoTitle"        column="seo_title"/>
         <result property="seoDescription"  column="seo_description"/>
         <result property="viewCount"       column="view_count"/>
+        <result property="videoPath"       column="video_path"/>
+        <result property="videoUrl"        column="video_url"/>
+        <result property="travelType"      column="travel_type"/>
+        <result property="minPeople"       column="min_people"/>
+        <result property="maxPeople"       column="max_people"/>
+        <result property="pricePerPerson"  column="price_per_person"/>
+        <result property="thumbnailPath"   column="thumbnail_path"/>
+        <result property="imageCount"      column="image_count"/>
+        <result property="fileCount"       column="file_count"/>
         <result property="createdBy"       column="created_by"/>
         <result property="updatedBy"       column="updated_by"/>
         <result property="createdAt"       column="created_at"/>
@@ -38,23 +47,20 @@
             p.product_code,
             p.product_name,
             p.product_subname,
-            p.summary,
-            p.description,
-            p.thumbnail_url,
             p.status,
             p.is_featured,
             p.is_active,
-            p.exposure_start_at,
-            p.exposure_end_at,
-            p.seo_title,
-            p.seo_description,
-            p.view_count,
-            p.created_by,
-            p.updated_by,
+            p.video_path,
+            p.video_url,
             p.created_at,
-            p.updated_at
+            p.updated_at,
+            thumb.image_path                                                           AS thumbnail_path,
+            (SELECT COUNT(*) FROM product_images pi WHERE pi.product_id = p.product_id) AS image_count,
+            (SELECT COUNT(*) FROM product_files  pf WHERE pf.product_id = p.product_id) AS file_count
         FROM products p
-        LEFT JOIN categories c ON p.category_id = c.category_id
+        LEFT JOIN categories c      ON p.category_id = c.category_id
+        LEFT JOIN product_images thumb ON thumb.product_id = p.product_id
+                                      AND thumb.image_type = 'THUMBNAIL'
         <where>
             <if test="search.categoryId != null">
                 AND p.category_id = #{search.categoryId}
@@ -105,6 +111,41 @@
         </where>
     </select>
 
+    <!-- 단건 조회 -->
+    <select id="findById" resultMap="ProductMap">
+        SELECT
+            p.product_id,
+            p.category_id,
+            c.category_name,
+            p.product_code,
+            p.product_name,
+            p.product_subname,
+            p.summary,
+            p.description,
+            p.thumbnail_url,
+            p.status,
+            p.is_featured,
+            p.is_active,
+            p.exposure_start_at,
+            p.exposure_end_at,
+            p.seo_title,
+            p.seo_description,
+            p.view_count,
+            p.video_path,
+            p.video_url,
+            p.travel_type,
+            p.min_people,
+            p.max_people,
+            p.price_per_person,
+            p.created_by,
+            p.updated_by,
+            p.created_at,
+            p.updated_at
+        FROM products p
+        LEFT JOIN categories c ON p.category_id = c.category_id
+        WHERE p.product_id = #{id}
+    </select>
+
     <!-- 상품코드 중복 체크 -->
     <select id="countByCode" resultType="int">
         SELECT COUNT(*)
@@ -116,7 +157,8 @@
     </select>
 
     <!-- 등록 -->
-    <insert id="insert" parameterType="com.nakshi.rohitour.dto.ProductDto">
+    <insert id="insert" parameterType="com.nakshi.rohitour.dto.ProductDto"
+            useGeneratedKeys="true" keyProperty="productId" keyColumn="product_id">
         INSERT INTO products (
             category_id,
             product_code,
@@ -124,7 +166,6 @@
             product_subname,
             summary,
             description,
-            thumbnail_url,
             status,
             is_featured,
             is_active,
@@ -132,6 +173,12 @@
             exposure_end_at,
             seo_title,
             seo_description,
+            travel_type,
+            min_people,
+            max_people,
+            price_per_person,
+            video_path,
+            video_url,
             created_by,
             updated_by,
             created_at,
@@ -143,7 +190,6 @@
             #{productSubname},
             #{summary},
             #{description},
-            #{thumbnailUrl},
             #{status},
             #{isFeatured},
             #{isActive},
@@ -151,6 +197,12 @@
             #{exposureEndAt},
             #{seoTitle},
             #{seoDescription},
+            #{travelType},
+            #{minPeople},
+            #{maxPeople},
+            #{pricePerPerson},
+            #{videoPath},
+            #{videoUrl},
             #{createdBy},
             #{updatedBy},
             NOW(),
@@ -167,7 +219,6 @@
             product_subname   = #{productSubname},
             summary           = #{summary},
             description       = #{description},
-            thumbnail_url     = #{thumbnailUrl},
             status            = #{status},
             is_featured       = #{isFeatured},
             is_active         = #{isActive},
@@ -175,8 +226,35 @@
             exposure_end_at   = #{exposureEndAt},
             seo_title         = #{seoTitle},
             seo_description   = #{seoDescription},
+            travel_type       = #{travelType},
+            min_people        = #{minPeople},
+            max_people        = #{maxPeople},
+            price_per_person  = #{pricePerPerson},
+            video_path        = #{videoPath},
+            video_url         = #{videoUrl},
             updated_by        = #{updatedBy},
             updated_at        = NOW()
+        WHERE product_id = #{productId}
+    </update>
+
+    <!-- 유튜브 URL 저장 (video_path 초기화) -->
+    <update id="updateVideoUrl">
+        UPDATE products
+        SET video_url = #{videoUrl}, video_path = NULL, updated_at = NOW()
+        WHERE product_id = #{productId}
+    </update>
+
+    <!-- 로컬 동영상 경로 저장 (video_url 초기화) -->
+    <update id="updateVideoPath">
+        UPDATE products
+        SET video_path = #{videoPath}, video_url = NULL, updated_at = NOW()
+        WHERE product_id = #{productId}
+    </update>
+
+    <!-- 동영상 삭제 -->
+    <update id="clearVideo">
+        UPDATE products
+        SET video_path = NULL, video_url = NULL, updated_at = NOW()
         WHERE product_id = #{productId}
     </update>
 

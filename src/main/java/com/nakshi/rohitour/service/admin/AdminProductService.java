@@ -30,6 +30,11 @@ public class AdminProductService {
         return new PageResponse<>(list, totalCount, pageRequest);
     }
 
+    /* 단건 조회 */
+    public ProductDto findById(Long id) {
+        return productMapper.findById(id);
+    }
+
     /* 등록 */
     public int insert(ProductDto dto) {
         int count = productMapper.countByCode(dto.getProductCode(), null);
@@ -42,6 +47,21 @@ public class AdminProductService {
     /* 수정 */
     public int update(ProductDto dto) {
         return productMapper.update(dto);
+    }
+
+    /* 유튜브 URL 저장 */
+    public void updateVideoUrl(Long productId, String videoUrl) {
+        productMapper.updateVideoUrl(productId, videoUrl);
+    }
+
+    /* 로컬 동영상 경로 저장 */
+    public void updateVideoPath(Long productId, String videoPath) {
+        productMapper.updateVideoPath(productId, videoPath);
+    }
+
+    /* 동영상 삭제 */
+    public void clearVideo(Long productId) {
+        productMapper.clearVideo(productId);
     }
 
     /* 논리 삭제 (비활성화) */

@@ -29,6 +29,18 @@ public class ProductDto {
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private LocalDateTime exposureEndAt;
 
+    private String videoPath;
+    private String videoUrl;
+    private String travelType;             // INDIVIDUAL / GROUP / BOTH
+    private Integer minPeople;
+    private Integer maxPeople;
+    private java.math.BigDecimal pricePerPerson;
+
+    // 목록 표시용 미디어 집계 (JOIN/서브쿼리)
+    private String thumbnailPath;   // product_images에서 JOIN
+    private int    imageCount;      // 전체 이미지 수 (썸네일 포함)
+    private int    fileCount;       // 첨부파일 수
+
     private String seoTitle;
     private String seoDescription;
     private Integer viewCount;

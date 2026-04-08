@@ -5,7 +5,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-@MapperScan("com.nakshi.rohitour.repository.admin")
+@MapperScan({
+    "com.nakshi.rohitour.repository.admin",
+    "com.nakshi.rohitour.repository.client"
+})
 public class ReactRestApiApplication {
 
     public static void main(String[] args) {
