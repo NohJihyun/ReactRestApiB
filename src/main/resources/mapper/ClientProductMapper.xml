@@ -13,6 +13,7 @@
         <result property="productName"    column="product_name"/>
         <result property="productSubname" column="product_subname"/>
         <result property="summary"        column="summary"/>
+        <result property="description"    column="description"/>
         <result property="status"         column="status"/>
         <result property="isFeatured"     column="is_featured"/>
         <result property="travelType"     column="travel_type"/>
@@ -21,10 +22,21 @@
         <result property="pricePerPerson" column="price_per_person"/>
         <result property="videoPath"      column="video_path"/>
         <result property="videoUrl"       column="video_url"/>
+        <result property="exposureStartAt" column="exposure_start_at"/>
+        <result property="exposureEndAt"   column="exposure_end_at"/>
         <result property="thumbnailPath"  column="thumbnail_path"/>
         <result property="imageCount"     column="image_count"/>
         <result property="fileCount"      column="file_count"/>
         <result property="createdAt"      column="created_at"/>
+    </resultMap>
+
+    <resultMap id="ClientImageMap" type="com.nakshi.rohitour.dto.ProductImageDto">
+        <id  property="id"         column="id"/>
+        <result property="productId"  column="product_id"/>
+        <result property="imagePath"  column="image_path"/>
+        <result property="imageType"  column="image_type"/>
+        <result property="sortOrder"  column="sort_order"/>
+        <result property="createdAt"  column="created_at"/>
     </resultMap>
 
     <!--
@@ -67,6 +79,68 @@
           AND root.category_name = #{categoryName}
           AND root.depth         = 1
         ORDER BY p.is_featured DESC, p.created_at DESC
+    </select>
+
+
+    <!-- 상품 단건 조회 (게시중·활성만) -->
+    <select id="findById" resultMap="ClientProductMap">
+        SELECT
+            p.product_id,
+            p.category_id,
+            c.category_name,
+            p.product_code,
+            p.product_name,
+            p.product_subname,
+            p.summary,
+            p.description,
+            p.status,
+            p.is_featured,
+            p.travel_type,
+            p.min_people,
+            p.max_people,
+            p.price_per_person,
+            p.video_path,
+            p.video_url,
+            p.exposure_start_at,
+            p.exposure_end_at,
+            p.created_at,
+            thumb.image_path AS thumbnail_path,
+            (SELECT COUNT(*) FROM product_images pi WHERE pi.product_id = p.product_id) AS image_count,
+            (SELECT COUNT(*) FROM product_files  pf WHERE pf.product_id = p.product_id) AS file_count
+        FROM products p
+        LEFT JOIN categories c    ON p.category_id = c.category_id
+        LEFT JOIN product_images thumb ON thumb.product_id = p.product_id
+                                       AND thumb.image_type = 'THUMBNAIL'
+        WHERE p.product_id = #{productId}
+          AND p.status      = 'PUBLISHED'
+          AND p.is_active   = 'Y'
+    </select>
+
+    <!-- 상품 이미지 목록 -->
+    <select id="findImagesByProductId" resultMap="ClientImageMap">
+        SELECT id, product_id, image_path, image_type, sort_order, created_at
+        FROM product_images
+        WHERE product_id = #{productId}
+        ORDER BY image_type DESC, sort_order ASC
+    </select>
+
+    <resultMap id="ClientFileMap" type="com.nakshi.rohitour.dto.ProductFileDto">
+        <id  property="id"         column="id"/>
+        <result property="productId"  column="product_id"/>
+        <result property="filePath"   column="file_path"/>
+        <result property="fileName"   column="file_name"/>
+        <result property="fileType"   column="file_type"/>
+        <result property="fileSize"   column="file_size"/>
+        <result property="sortOrder"  column="sort_order"/>
+        <result property="createdAt"  column="created_at"/>
+    </resultMap>
+
+    <!-- 상품 첨부파일 목록 (퍼블릭) -->
+    <select id="findFilesByProductId" resultMap="ClientFileMap">
+        SELECT id, product_id, file_path, file_name, file_type, file_size, sort_order, created_at
+        FROM product_files
+        WHERE product_id = #{productId}
+        ORDER BY sort_order ASC, created_at ASC
     </select>
 
 </mapper>

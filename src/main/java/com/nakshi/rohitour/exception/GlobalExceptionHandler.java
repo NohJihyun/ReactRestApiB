@@ -1,6 +1,7 @@
 package com.nakshi.rohitour.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -27,6 +28,15 @@ public class GlobalExceptionHandler {
         return Map.of(
                 "status", 409,
                 "message", e.getMessage()
+        );
+    }
+
+    @ExceptionHandler(DuplicateKeyException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public Map<String, Object> handleDuplicateKey(DuplicateKeyException e) {
+        return Map.of(
+                "status", 409,
+                "message", "이미 사용 중인 카테고리 코드입니다."
         );
     }
 
