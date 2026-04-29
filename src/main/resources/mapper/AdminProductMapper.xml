@@ -29,6 +29,16 @@
         <result property="minPeople"       column="min_people"/>
         <result property="maxPeople"       column="max_people"/>
         <result property="pricePerPerson"  column="price_per_person"/>
+        <result property="transportType"    column="transport_type"/>
+        <result property="hasShopping"      column="has_shopping"/>
+        <result property="hasGuideFee"      column="has_guide_fee"/>
+        <result property="hasEscort"        column="has_escort"/>
+        <result property="hasOptionalTour"  column="has_optional_tour"/>
+        <result property="departureLocation" column="departure_location"/>
+        <result property="departureAt"       column="departure_at"/>
+        <result property="arrivalLocation"   column="arrival_location"/>
+        <result property="arrivalAt"         column="arrival_at"/>
+        <result property="hashtags"          column="hashtags"/>
         <result property="thumbnailPath"   column="thumbnail_path"/>
         <result property="imageCount"      column="image_count"/>
         <result property="fileCount"       column="file_count"/>
@@ -137,6 +147,16 @@
             p.min_people,
             p.max_people,
             p.price_per_person,
+            p.transport_type,
+            p.has_shopping,
+            p.has_guide_fee,
+            p.has_escort,
+            p.has_optional_tour,
+            p.departure_location,
+            p.departure_at,
+            p.arrival_location,
+            p.arrival_at,
+            p.hashtags,
             p.created_by,
             p.updated_by,
             p.created_at,
@@ -179,6 +199,16 @@
             price_per_person,
             video_path,
             video_url,
+            transport_type,
+            has_shopping,
+            has_guide_fee,
+            has_escort,
+            has_optional_tour,
+            departure_location,
+            departure_at,
+            arrival_location,
+            arrival_at,
+            hashtags,
             created_by,
             updated_by,
             created_at,
@@ -203,6 +233,16 @@
             #{pricePerPerson},
             #{videoPath},
             #{videoUrl},
+            #{transportType},
+            #{hasShopping},
+            #{hasGuideFee},
+            #{hasEscort},
+            #{hasOptionalTour},
+            #{departureLocation},
+            #{departureAt},
+            #{arrivalLocation},
+            #{arrivalAt},
+            #{hashtags},
             #{createdBy},
             #{updatedBy},
             NOW(),
@@ -230,10 +270,20 @@
             min_people        = #{minPeople},
             max_people        = #{maxPeople},
             price_per_person  = #{pricePerPerson},
-            video_path        = #{videoPath},
-            video_url         = #{videoUrl},
-            updated_by        = #{updatedBy},
-            updated_at        = NOW()
+            video_path         = #{videoPath},
+            video_url          = #{videoUrl},
+            transport_type     = #{transportType},
+            has_shopping       = #{hasShopping},
+            has_guide_fee      = #{hasGuideFee},
+            has_escort         = #{hasEscort},
+            has_optional_tour  = #{hasOptionalTour},
+            departure_location = #{departureLocation},
+            departure_at       = #{departureAt},
+            arrival_location   = #{arrivalLocation},
+            arrival_at         = #{arrivalAt},
+            hashtags           = #{hashtags},
+            updated_by         = #{updatedBy},
+            updated_at         = NOW()
         WHERE product_id = #{productId}
     </update>
 

@@ -24,6 +24,16 @@
         <result property="videoUrl"       column="video_url"/>
         <result property="exposureStartAt" column="exposure_start_at"/>
         <result property="exposureEndAt"   column="exposure_end_at"/>
+        <result property="transportType"    column="transport_type"/>
+        <result property="hasShopping"      column="has_shopping"/>
+        <result property="hasGuideFee"      column="has_guide_fee"/>
+        <result property="hasEscort"        column="has_escort"/>
+        <result property="hasOptionalTour"  column="has_optional_tour"/>
+        <result property="departureLocation" column="departure_location"/>
+        <result property="departureAt"       column="departure_at"/>
+        <result property="arrivalLocation"   column="arrival_location"/>
+        <result property="arrivalAt"         column="arrival_at"/>
+        <result property="hashtags"          column="hashtags"/>
         <result property="thumbnailPath"  column="thumbnail_path"/>
         <result property="imageCount"     column="image_count"/>
         <result property="fileCount"      column="file_count"/>
@@ -61,6 +71,17 @@
             p.price_per_person,
             p.video_path,
             p.video_url,
+            p.transport_type,
+            p.has_shopping,
+            p.has_guide_fee,
+            p.has_escort,
+            p.has_optional_tour,
+            p.departure_location,
+            p.departure_at,
+            p.arrival_location,
+            p.arrival_at,
+            p.hashtags,
+            p.exposure_end_at,
             p.created_at,
             thumb.image_path                                                               AS thumbnail_path,
             (SELECT COUNT(*) FROM product_images pi WHERE pi.product_id = p.product_id)   AS image_count,
@@ -101,6 +122,16 @@
             p.price_per_person,
             p.video_path,
             p.video_url,
+            p.transport_type,
+            p.has_shopping,
+            p.has_guide_fee,
+            p.has_escort,
+            p.has_optional_tour,
+            p.departure_location,
+            p.departure_at,
+            p.arrival_location,
+            p.arrival_at,
+            p.hashtags,
             p.exposure_start_at,
             p.exposure_end_at,
             p.created_at,

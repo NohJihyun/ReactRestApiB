@@ -41,6 +41,24 @@ public class ProductDto {
     private int    imageCount;      // 전체 이미지 수 (썸네일 포함)
     private int    fileCount;       // 첨부파일 수
 
+    private String transportType;
+    private String hasShopping;
+    private String hasGuideFee;
+    private String hasEscort;
+    private String hasOptionalTour;
+
+    private String departureLocation;
+
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
+    private LocalDateTime departureAt;
+
+    private String arrivalLocation;
+
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
+    private LocalDateTime arrivalAt;
+
+    private String hashtags;
+
     private String seoTitle;
     private String seoDescription;
     private Integer viewCount;
