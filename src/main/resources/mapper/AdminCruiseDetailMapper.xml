@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.nakshi.rohitour.repository.admin.AdminCruiseDetailMapper">
+
+    <resultMap id="DetailMap" type="com.nakshi.rohitour.dto.CruiseDetailDto">
+        <id     property="id"               column="id"/>
+        <result property="productId"        column="product_id"/>
+        <result property="includedItems"    column="included_items"/>
+        <result property="excludedItems"    column="excluded_items"/>
+        <result property="guideName"        column="guide_name"/>
+        <result property="guidePhone"       column="guide_phone"/>
+        <result property="meetingLocation"  column="meeting_location"/>
+        <result property="meetingTime"      column="meeting_time"/>
+        <result property="notes"            column="notes"/>
+        <result property="insuranceInfo"    column="insurance_info"/>
+        <result property="emergencyContact" column="emergency_contact"/>
+        <result property="passportVisaInfo" column="passport_visa_info"/>
+        <result property="otherNotices"     column="other_notices"/>
+        <result property="ageAdult"           column="age_adult"/>
+        <result property="ageChild"           column="age_child"/>
+        <result property="ageInfant"          column="age_infant"/>
+        <result property="terms"              column="terms"/>
+        <result property="reservationNotes"   column="reservation_notes"/>
+        <result property="entryRegulations"   column="entry_regulations"/>
+        <result property="surchargeInfo"      column="surcharge_info"/>
+        <result property="createdAt"          column="created_at"/>
+        <result property="updatedAt"        column="updated_at"/>
+    </resultMap>
+
+    <select id="findByProductId" resultMap="DetailMap">
+        SELECT id, product_id, included_items, excluded_items,
+               guide_name, guide_phone, meeting_location, meeting_time, notes,
+               insurance_info, emergency_contact, passport_visa_info, other_notices,
+               age_adult, age_child, age_infant,
+               terms, reservation_notes, entry_regulations, surcharge_info,
+               created_at, updated_at
+        FROM cruise_details
+        WHERE product_id = #{productId}
+    </select>
+
+    <insert id="insert" parameterType="com.nakshi.rohitour.dto.CruiseDetailDto"
+            useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO cruise_details (
+            product_id, included_items, excluded_items,
+            guide_name, guide_phone, meeting_location, meeting_time, notes,
+            insurance_info, emergency_contact, passport_visa_info, other_notices,
+            age_adult, age_child, age_infant,
+            terms, reservation_notes, entry_regulations, surcharge_info,
+            created_at, updated_at
+        ) VALUES (
+            #{productId}, #{includedItems}, #{excludedItems},
+            #{guideName}, #{guidePhone}, #{meetingLocation}, #{meetingTime}, #{notes},
+            #{insuranceInfo}, #{emergencyContact}, #{passportVisaInfo}, #{otherNotices},
+            #{ageAdult}, #{ageChild}, #{ageInfant},
+            #{terms}, #{reservationNotes}, #{entryRegulations}, #{surchargeInfo},
+            NOW(), NOW()
+        )
+    </insert>
+
+    <update id="update" parameterType="com.nakshi.rohitour.dto.CruiseDetailDto">
+        UPDATE cruise_details SET
+            included_items   = #{includedItems},
+            excluded_items   = #{excludedItems},
+            guide_name       = #{guideName},
+            guide_phone      = #{guidePhone},
+            meeting_location = #{meetingLocation},
+            meeting_time     = #{meetingTime},
+            notes            = #{notes},
+            insurance_info   = #{insuranceInfo},
+            emergency_contact = #{emergencyContact},
+            passport_visa_info = #{passportVisaInfo},
+            other_notices    = #{otherNotices},
+            age_adult          = #{ageAdult},
+            age_child          = #{ageChild},
+            age_infant         = #{ageInfant},
+            terms              = #{terms},
+            reservation_notes  = #{reservationNotes},
+            entry_regulations  = #{entryRegulations},
+            surcharge_info     = #{surchargeInfo},
+            updated_at         = NOW()
+        WHERE product_id = #{productId}
+    </update>
+
+</mapper>

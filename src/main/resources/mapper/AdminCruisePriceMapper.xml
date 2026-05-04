@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.nakshi.rohitour.repository.admin.AdminCruisePriceMapper">
+
+    <resultMap id="PriceMap" type="com.nakshi.rohitour.dto.CruisePriceDto">
+        <id     property="id"          column="id"/>
+        <result property="productId"   column="product_id"/>
+        <result property="cabinType"   column="cabin_type"/>
+        <result property="priceAdult"  column="price_adult"/>
+        <result property="priceChild"  column="price_child"/>
+        <result property="priceInfant" column="price_infant"/>
+        <result property="sortOrder"   column="sort_order"/>
+        <result property="createdAt"   column="created_at"/>
+    </resultMap>
+
+    <select id="findByProductId" resultMap="PriceMap">
+        SELECT id, product_id, cabin_type, price_adult, price_child, price_infant, sort_order, created_at
+        FROM cruise_prices
+        WHERE product_id = #{productId}
+        ORDER BY sort_order ASC
+    </select>
+
+    <select id="findById" resultMap="PriceMap">
+        SELECT id, product_id, cabin_type, price_adult, price_child, price_infant, sort_order, created_at
+        FROM cruise_prices
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.nakshi.rohitour.dto.CruisePriceDto"
+            useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO cruise_prices (product_id, cabin_type, price_adult, price_child, price_infant, sort_order, created_at)
+        VALUES (#{productId}, #{cabinType}, #{priceAdult}, #{priceChild}, #{priceInfant}, #{sortOrder}, NOW())
+    </insert>
+
+    <update id="update" parameterType="com.nakshi.rohitour.dto.CruisePriceDto">
+        UPDATE cruise_prices SET
+            cabin_type   = #{cabinType},
+            price_adult  = #{priceAdult},
+            price_child  = #{priceChild},
+            price_infant = #{priceInfant},
+            sort_order   = #{sortOrder}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM cruise_prices WHERE id = #{id}
+    </delete>
+
+    <delete id="deleteByProductId">
+        DELETE FROM cruise_prices WHERE product_id = #{productId}
+    </delete>
+
+</mapper>

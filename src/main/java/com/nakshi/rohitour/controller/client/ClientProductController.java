@@ -1,8 +1,6 @@
 package com.nakshi.rohitour.controller.client;
 
-import com.nakshi.rohitour.dto.ProductDto;
-import com.nakshi.rohitour.dto.ProductFileDto;
-import com.nakshi.rohitour.dto.ProductImageDto;
+import com.nakshi.rohitour.dto.*;
 import com.nakshi.rohitour.service.client.ClientProductService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -44,5 +42,23 @@ public class ClientProductController {
     @GetMapping("/{id}/files")
     public List<ProductFileDto> getFiles(@PathVariable Long id) {
         return service.getFiles(id);
+    }
+
+    /** GET /api/products/{id}/cruise-itineraries */
+    @GetMapping("/{id}/cruise-itineraries")
+    public List<CruiseItineraryDto> getCruiseItineraries(@PathVariable Long id) {
+        return service.getCruiseItineraries(id);
+    }
+
+    /** GET /api/products/{id}/cruise-details */
+    @GetMapping("/{id}/cruise-details")
+    public CruiseDetailDto getCruiseDetail(@PathVariable Long id) {
+        return service.getCruiseDetail(id);
+    }
+
+    /** GET /api/products/{id}/cruise-prices */
+    @GetMapping("/{id}/cruise-prices")
+    public List<CruisePriceDto> getCruisePrices(@PathVariable Long id) {
+        return service.getCruisePrices(id);
     }
 }
