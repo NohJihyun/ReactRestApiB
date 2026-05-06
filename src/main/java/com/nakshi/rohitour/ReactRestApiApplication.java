@@ -7,7 +7,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 @MapperScan({
     "com.nakshi.rohitour.repository.admin",
-    "com.nakshi.rohitour.repository.client"
+    "com.nakshi.rohitour.repository.client",
+    "com.nakshi.rohitour.repository.review"
 })
 public class ReactRestApiApplication {
 

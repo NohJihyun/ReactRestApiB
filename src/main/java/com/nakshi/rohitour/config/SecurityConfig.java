@@ -71,6 +71,10 @@ public class SecurityConfig {
                         // 업로드 파일 공개 접근
                         .requestMatchers("/uploads/**").permitAll()
 
+                        // 리뷰 공개 조회
+                        .requestMatchers(HttpMethod.GET, "/api/products/*/reviews/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/reviews/recent").permitAll()
+
                         // 클라이언트 공개 상품 API
                         .requestMatchers("/api/products/**").permitAll()
 

@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.nakshi.rohitour.repository.review.ReviewMapper">
+
+    <resultMap id="ReviewMap" type="com.nakshi.rohitour.dto.ReviewDto">
+        <id     property="id"          column="id"/>
+        <result property="productId"   column="product_id"/>
+        <result property="productName" column="product_name"/>
+        <result property="userId"      column="user_id"/>
+        <result property="userName"    column="user_name"/>
+        <result property="writerType"  column="writer_type"/>
+        <result property="rating"      column="rating"/>
+        <result property="content"     column="content"/>
+        <result property="status"      column="status"/>
+        <result property="commentCount" column="comment_count"/>
+        <result property="createdAt"   column="created_at"/>
+        <result property="updatedAt"   column="updated_at"/>
+    </resultMap>
+
+    <resultMap id="StatsMap" type="com.nakshi.rohitour.dto.ReviewStatsDto">
+        <result property="totalCount"     column="total_count"/>
+        <result property="averageRating"  column="average_rating"/>
+    </resultMap>
+
+    <!-- 상품별 후기 목록 (PUBLISHED만) -->
+    <select id="findByProductId" resultMap="ReviewMap">
+        SELECT r.id, r.product_id, p.product_name, r.user_id, u.name AS user_name,
+               r.writer_type, r.rating, r.content, r.status,
+               (SELECT COUNT(*) FROM review_comments rc WHERE rc.review_id = r.id) AS comment_count,
+               r.created_at, r.updated_at
+        FROM reviews r
+        JOIN users u ON r.user_id = u.user_id
+        JOIN products p ON r.product_id = p.product_id
+        WHERE r.product_id = #{productId} AND r.status = 'PUBLISHED'
+        ORDER BY r.created_at DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <select id="countByProductId" resultType="int">
+        SELECT COUNT(*) FROM reviews WHERE product_id = #{productId} AND status = 'PUBLISHED'
+    </select>
+
+    <!-- 상품 별점/후기수 통계 -->
+    <select id="getStats" resultMap="StatsMap">
+        SELECT COUNT(*) AS total_count,
+               COALESCE(ROUND(AVG(rating)::numeric, 1), 0) AS average_rating
+        FROM reviews
+        WHERE product_id = #{productId} AND status = 'PUBLISHED'
+    </select>
+
+    <!-- 메인 홈 최근 후기 -->
+    <select id="findRecentPublished" resultMap="ReviewMap">
+        SELECT r.id, r.product_id, p.product_name, r.user_id, u.name AS user_name,
+               r.writer_type, r.rating, r.content, r.status,
+               0 AS comment_count,
+               r.created_at, r.updated_at
+        FROM reviews r
+        JOIN users u ON r.user_id = u.user_id
+        JOIN products p ON r.product_id = p.product_id
+        WHERE r.status = 'PUBLISHED'
+        ORDER BY r.created_at DESC
+        LIMIT #{limit}
+    </select>
+
+    <!-- 내 후기 목록 (마이페이지) -->
+    <select id="findByUserId" resultMap="ReviewMap">
+        SELECT r.id, r.product_id, p.product_name, r.user_id, u.name AS user_name,
+               r.writer_type, r.rating, r.content, r.status,
+               (SELECT COUNT(*) FROM review_comments rc WHERE rc.review_id = r.id) AS comment_count,
+               r.created_at, r.updated_at
+        FROM reviews r
+        JOIN users u ON r.user_id = u.user_id
+        JOIN products p ON r.product_id = p.product_id
+        WHERE r.user_id = #{userId}
+        ORDER BY r.created_at DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <select id="countByUserId" resultType="int">
+        SELECT COUNT(*) FROM reviews WHERE user_id = #{userId}
+    </select>
+
+    <!-- 단건 조회 -->
+    <select id="findById" resultMap="ReviewMap">
+        SELECT r.id, r.product_id, p.product_name, r.user_id, u.name AS user_name,
+               r.writer_type, r.rating, r.content, r.status,
+               (SELECT COUNT(*) FROM review_comments rc WHERE rc.review_id = r.id) AS comment_count,
+               r.created_at, r.updated_at
+        FROM reviews r
+        JOIN users u ON r.user_id = u.user_id
+        JOIN products p ON r.product_id = p.product_id
+        WHERE r.id = #{id}
+    </select>
+
+    <!-- 관리자 전체 목록 (동적 검색 + 페이지네이션) -->
+    <select id="findAll" resultMap="ReviewMap">
+        SELECT r.id, r.product_id, p.product_name, r.user_id, u.name AS user_name,
+               r.writer_type, r.rating, r.content, r.status,
+               (SELECT COUNT(*) FROM review_comments rc WHERE rc.review_id = r.id) AS comment_count,
+               r.created_at, r.updated_at
+        FROM reviews r
+        JOIN users u ON r.user_id = u.user_id
+        JOIN products p ON r.product_id = p.product_id
+        WHERE 1=1
+        <if test="status != null and status != ''">
+            AND r.status = #{status}
+        </if>
+        <if test="writerType != null and writerType != ''">
+            AND r.writer_type = #{writerType}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND (u.name LIKE '%' || #{keyword} || '%'
+              OR p.product_name LIKE '%' || #{keyword} || '%'
+              OR r.content LIKE '%' || #{keyword} || '%')
+        </if>
+        ORDER BY r.created_at DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <select id="countAll" resultType="int">
+        SELECT COUNT(*)
+        FROM reviews r
+        JOIN users u ON r.user_id = u.user_id
+        JOIN products p ON r.product_id = p.product_id
+        WHERE 1=1
+        <if test="status != null and status != ''">
+            AND r.status = #{status}
+        </if>
+        <if test="writerType != null and writerType != ''">
+            AND r.writer_type = #{writerType}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND (u.name LIKE '%' || #{keyword} || '%'
+              OR p.product_name LIKE '%' || #{keyword} || '%'
+              OR r.content LIKE '%' || #{keyword} || '%')
+        </if>
+    </select>
+
+    <insert id="insert" parameterType="com.nakshi.rohitour.dto.ReviewDto"
+            useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO reviews (product_id, user_id, writer_type, rating, content, status, created_at, updated_at)
+        VALUES (#{productId}, #{userId}, #{writerType}, #{rating}, #{content}, 'PUBLISHED', NOW(), NOW())
+    </insert>
+
+    <update id="update" parameterType="com.nakshi.rohitour.dto.ReviewDto">
+        UPDATE reviews
+        SET writer_type = #{writerType}, rating = #{rating}, content = #{content}, updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateStatus">
+        UPDATE reviews SET status = #{status}, updated_at = NOW() WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM reviews WHERE id = #{id}
+    </delete>
+
+</mapper>
