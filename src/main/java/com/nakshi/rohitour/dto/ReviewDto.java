@@ -17,6 +17,7 @@ public class ReviewDto {
     private int rating;
     private String content;
     private String status;       // PUBLISHED / HIDDEN
+    private String rootCategoryName;
     private List<ReviewImageDto> images;
     private List<ReviewCommentDto> comments;
     private int commentCount;
