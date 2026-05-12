@@ -61,4 +61,40 @@ public class ClientProductController {
     public List<CruisePriceDto> getCruisePrices(@PathVariable Long id) {
         return service.getCruisePrices(id);
     }
+
+    /** GET /api/products/{id}/air-itineraries */
+    @GetMapping("/{id}/air-itineraries")
+    public List<AirItineraryDto> getAirItineraries(@PathVariable Long id) {
+        return service.getAirItineraries(id);
+    }
+
+    /** GET /api/products/{id}/air-details */
+    @GetMapping("/{id}/air-details")
+    public AirDetailDto getAirDetail(@PathVariable Long id) {
+        return service.getAirDetail(id);
+    }
+
+    /** GET /api/products/{id}/domestic-itineraries */
+    @GetMapping("/{id}/domestic-itineraries")
+    public List<DomesticItineraryDto> getDomesticItineraries(@PathVariable Long id) {
+        return service.getDomesticItineraries(id);
+    }
+
+    /** GET /api/products/{id}/domestic-details */
+    @GetMapping("/{id}/domestic-details")
+    public DomesticDetailDto getDomesticDetail(@PathVariable Long id) {
+        return service.getDomesticDetail(id);
+    }
+
+    /** GET /api/products/{id}/school-trip-itineraries */
+    @GetMapping("/{id}/school-trip-itineraries")
+    public List<SchoolTripItineraryDto> getSchoolTripItineraries(@PathVariable Long id) {
+        return service.getSchoolTripItineraries(id);
+    }
+
+    /** GET /api/products/{id}/school-trip-details */
+    @GetMapping("/{id}/school-trip-details")
+    public SchoolTripDetailDto getSchoolTripDetail(@PathVariable Long id) {
+        return service.getSchoolTripDetail(id);
+    }
 }

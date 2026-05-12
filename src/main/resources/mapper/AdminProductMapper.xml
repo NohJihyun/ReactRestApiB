@@ -42,6 +42,8 @@
         <result property="thumbnailPath"   column="thumbnail_path"/>
         <result property="imageCount"      column="image_count"/>
         <result property="fileCount"       column="file_count"/>
+        <result property="itineraryCount"  column="itinerary_count"/>
+        <result property="hasDetail"       column="has_detail"/>
         <result property="createdBy"       column="created_by"/>
         <result property="updatedBy"       column="updated_by"/>
         <result property="createdAt"       column="created_at"/>
@@ -67,7 +69,19 @@
             p.updated_at,
             thumb.image_path                                                           AS thumbnail_path,
             (SELECT COUNT(*) FROM product_images pi WHERE pi.product_id = p.product_id) AS image_count,
-            (SELECT COUNT(*) FROM product_files  pf WHERE pf.product_id = p.product_id) AS file_count
+            (SELECT COUNT(*) FROM product_files  pf WHERE pf.product_id = p.product_id) AS file_count,
+            (
+                COALESCE((SELECT COUNT(*) FROM cruise_itineraries      WHERE product_id = p.product_id), 0) +
+                COALESCE((SELECT COUNT(*) FROM air_itineraries         WHERE product_id = p.product_id), 0) +
+                COALESCE((SELECT COUNT(*) FROM domestic_itineraries    WHERE product_id = p.product_id), 0) +
+                COALESCE((SELECT COUNT(*) FROM school_trip_itineraries WHERE product_id = p.product_id), 0)
+            ) AS itinerary_count,
+            (
+                EXISTS (SELECT 1 FROM cruise_details      WHERE product_id = p.product_id) OR
+                EXISTS (SELECT 1 FROM air_details         WHERE product_id = p.product_id) OR
+                EXISTS (SELECT 1 FROM domestic_details    WHERE product_id = p.product_id) OR
+                EXISTS (SELECT 1 FROM school_trip_details WHERE product_id = p.product_id)
+            ) AS has_detail
         FROM products p
         LEFT JOIN categories c      ON p.category_id = c.category_id
         LEFT JOIN product_images thumb ON thumb.product_id = p.product_id

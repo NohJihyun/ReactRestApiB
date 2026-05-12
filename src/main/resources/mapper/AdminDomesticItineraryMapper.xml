@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.nakshi.rohitour.repository.admin.AdminDomesticItineraryMapper">
+
+    <resultMap id="ItineraryMap" type="com.nakshi.rohitour.dto.DomesticItineraryDto">
+        <id     property="id"                   column="id"/>
+        <result property="productId"             column="product_id"/>
+        <result property="dayNumber"             column="day_number"/>
+        <result property="title"                 column="title"/>
+        <result property="description"           column="description"/>
+        <result property="hotelName"             column="hotel_name"/>
+        <result property="shoppingCenterName"    column="shopping_center_name"/>
+        <result property="shoppingExchangeInfo"  column="shopping_exchange_info"/>
+        <result property="shoppingInfo"          column="shopping_info"/>
+        <result property="sortOrder"             column="sort_order"/>
+        <result property="createdAt"             column="created_at"/>
+    </resultMap>
+
+    <select id="findByProductId" resultMap="ItineraryMap">
+        SELECT id, product_id, day_number, title, description,
+               hotel_name, shopping_center_name, shopping_exchange_info,
+               shopping_info, sort_order, created_at
+        FROM domestic_itineraries
+        WHERE product_id = #{productId}
+        ORDER BY sort_order ASC, day_number ASC
+    </select>
+
+    <select id="findById" resultMap="ItineraryMap">
+        SELECT id, product_id, day_number, title, description,
+               hotel_name, shopping_center_name, shopping_exchange_info,
+               shopping_info, sort_order, created_at
+        FROM domestic_itineraries
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.nakshi.rohitour.dto.DomesticItineraryDto"
+            useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO domestic_itineraries (
+            product_id, day_number, title, description,
+            hotel_name, shopping_center_name, shopping_exchange_info,
+            shopping_info, sort_order, created_at
+        ) VALUES (
+            #{productId}, #{dayNumber}, #{title}, #{description},
+            #{hotelName}, #{shoppingCenterName}, #{shoppingExchangeInfo},
+            #{shoppingInfo}, #{sortOrder}, NOW()
+        )
+    </insert>
+
+    <update id="update" parameterType="com.nakshi.rohitour.dto.DomesticItineraryDto">
+        UPDATE domestic_itineraries SET
+            day_number             = #{dayNumber},
+            title                  = #{title},
+            description            = #{description},
+            hotel_name             = #{hotelName},
+            shopping_center_name   = #{shoppingCenterName},
+            shopping_exchange_info = #{shoppingExchangeInfo},
+            shopping_info          = #{shoppingInfo},
+            sort_order             = #{sortOrder}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM domestic_itineraries WHERE id = #{id}
+    </delete>
+
+</mapper>

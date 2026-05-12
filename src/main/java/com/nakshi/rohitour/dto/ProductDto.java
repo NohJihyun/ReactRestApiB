@@ -37,9 +37,11 @@ public class ProductDto {
     private java.math.BigDecimal pricePerPerson;
 
     // 목록 표시용 미디어 집계 (JOIN/서브쿼리)
-    private String thumbnailPath;   // product_images에서 JOIN
-    private int    imageCount;      // 전체 이미지 수 (썸네일 포함)
-    private int    fileCount;       // 첨부파일 수
+    private String  thumbnailPath;    // product_images에서 JOIN
+    private int     imageCount;       // 전체 이미지 수 (썸네일 포함)
+    private int     fileCount;        // 첨부파일 수
+    private int     itineraryCount;   // 카테고리별 일정 수
+    private boolean hasDetail;        // 상세정보(가격 등) 저장 여부
 
     private String transportType;
     private String hasShopping;

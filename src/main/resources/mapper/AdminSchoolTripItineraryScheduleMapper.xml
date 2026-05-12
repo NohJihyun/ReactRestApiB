@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.nakshi.rohitour.repository.admin.AdminSchoolTripItineraryScheduleMapper">
+
+    <resultMap id="ScheduleMap" type="com.nakshi.rohitour.dto.SchoolTripItineraryScheduleDto">
+        <id     property="id"           column="id"/>
+        <result property="itineraryId"  column="itinerary_id"/>
+        <result property="time"         column="time"/>
+        <result property="description"  column="description"/>
+        <result property="sortOrder"    column="sort_order"/>
+        <result property="createdAt"    column="created_at"/>
+    </resultMap>
+
+    <select id="findByItineraryId" resultMap="ScheduleMap">
+        SELECT id, itinerary_id, time, description, sort_order, created_at
+        FROM school_trip_itinerary_schedules
+        WHERE itinerary_id = #{itineraryId}
+        ORDER BY sort_order ASC
+    </select>
+
+    <select id="findById" resultMap="ScheduleMap">
+        SELECT id, itinerary_id, time, description, sort_order, created_at
+        FROM school_trip_itinerary_schedules
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.nakshi.rohitour.dto.SchoolTripItineraryScheduleDto"
+            useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO school_trip_itinerary_schedules (itinerary_id, time, description, sort_order, created_at)
+        VALUES (#{itineraryId}, #{time}, #{description}, #{sortOrder}, NOW())
+    </insert>
+
+    <update id="update" parameterType="com.nakshi.rohitour.dto.SchoolTripItineraryScheduleDto">
+        UPDATE school_trip_itinerary_schedules SET
+            time        = #{time},
+            description = #{description},
+            sort_order  = #{sortOrder}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM school_trip_itinerary_schedules WHERE id = #{id}
+    </delete>
+
+    <delete id="deleteByItineraryId">
+        DELETE FROM school_trip_itinerary_schedules WHERE itinerary_id = #{itineraryId}
+    </delete>
+
+</mapper>
