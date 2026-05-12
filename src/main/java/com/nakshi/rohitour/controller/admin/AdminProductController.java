@@ -108,7 +108,7 @@ public class AdminProductController {
 
     /* 물리 삭제 */
     @DeleteMapping("/{id}/delete")
-    public int delete(@PathVariable Long id) {
+    public int delete(@PathVariable Long id) throws java.io.IOException {
         return productService.delete(id);
     }
 }

@@ -22,4 +22,6 @@ public interface ReviewMapper {
     void update(ReviewDto dto);
     void updateStatus(@Param("id") Long id, @Param("status") String status);
     void delete(@Param("id") Long id);
+    List<ReviewDto> findAllByProductId(@Param("productId") Long productId);
+    void deleteAllByProductId(@Param("productId") Long productId);
 }

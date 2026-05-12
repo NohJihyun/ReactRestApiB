@@ -4,19 +4,38 @@ import com.nakshi.rohitour.common.paging.PageRequest;
 import com.nakshi.rohitour.common.paging.PageResponse;
 import com.nakshi.rohitour.dto.ProductDto;
 import com.nakshi.rohitour.dto.ProductSearchDto;
+import com.nakshi.rohitour.dto.ReviewDto;
+import com.nakshi.rohitour.dto.ReviewImageDto;
 import com.nakshi.rohitour.exception.DuplicateException;
 import com.nakshi.rohitour.repository.admin.AdminProductMapper;
+import com.nakshi.rohitour.repository.review.ReviewImageMapper;
+import com.nakshi.rohitour.repository.review.ReviewMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 @Service
 public class AdminProductService {
 
     private final AdminProductMapper productMapper;
+    private final ReviewMapper reviewMapper;
+    private final ReviewImageMapper reviewImageMapper;
 
-    public AdminProductService(AdminProductMapper productMapper) {
-        this.productMapper = productMapper;
+    @Value("${app.upload.base-dir}")
+    private String uploadBaseDir;
+
+    public AdminProductService(AdminProductMapper productMapper,
+                               ReviewMapper reviewMapper,
+                               ReviewImageMapper reviewImageMapper) {
+        this.productMapper    = productMapper;
+        this.reviewMapper     = reviewMapper;
+        this.reviewImageMapper = reviewImageMapper;
     }
 
     /* 목록 + 검색 + 페이지네이션 */
@@ -69,8 +88,22 @@ public class AdminProductService {
         return productMapper.deactivate(id);
     }
 
-    /* 물리 삭제 */
-    public int delete(Long id) {
+    /* 물리 삭제 — 후기 이미지 파일 정리 후 삭제 */
+    @Transactional
+    public int delete(Long id) throws IOException {
+        List<ReviewDto> reviews = reviewMapper.findAllByProductId(id);
+        for (ReviewDto review : reviews) {
+            List<ReviewImageDto> images = reviewImageMapper.findByReviewId(review.getId());
+            for (ReviewImageDto img : images) deletePhysicalFile(img.getImagePath());
+        }
+        reviewMapper.deleteAllByProductId(id);
         return productMapper.delete(id);
+    }
+
+    private void deletePhysicalFile(String relativePath) throws IOException {
+        if (relativePath == null || relativePath.isBlank()) return;
+        String localPath = relativePath.replace("/uploads/", "");
+        Path fullPath = Paths.get(uploadBaseDir, localPath);
+        Files.deleteIfExists(fullPath);
     }
 }

@@ -3,9 +3,9 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.nakshi.rohitour.repository.admin.AdminCruiseItineraryScheduleMapper">
+<mapper namespace="com.nakshi.rohitour.repository.admin.AdminAirItineraryScheduleMapper">
 
-    <resultMap id="ScheduleMap" type="com.nakshi.rohitour.dto.CruiseItineraryScheduleDto">
+    <resultMap id="ScheduleMap" type="com.nakshi.rohitour.dto.AirItineraryScheduleDto">
         <id     property="id"           column="id"/>
         <result property="itineraryId"  column="itinerary_id"/>
         <result property="time"         column="time"/>
@@ -16,25 +16,25 @@
 
     <select id="findByItineraryId" resultMap="ScheduleMap">
         SELECT id, itinerary_id, time, description, sort_order, created_at
-        FROM cruise_itinerary_schedules
+        FROM air_itinerary_schedules
         WHERE itinerary_id = #{itineraryId}
         ORDER BY sort_order ASC
     </select>
 
     <select id="findById" resultMap="ScheduleMap">
         SELECT id, itinerary_id, time, description, sort_order, created_at
-        FROM cruise_itinerary_schedules
+        FROM air_itinerary_schedules
         WHERE id = #{id}
     </select>
 
-    <insert id="insert" parameterType="com.nakshi.rohitour.dto.CruiseItineraryScheduleDto"
+    <insert id="insert" parameterType="com.nakshi.rohitour.dto.AirItineraryScheduleDto"
             useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-        INSERT INTO cruise_itinerary_schedules (itinerary_id, time, description, sort_order, created_at)
+        INSERT INTO air_itinerary_schedules (itinerary_id, time, description, sort_order, created_at)
         VALUES (#{itineraryId}, #{time}, #{description}, #{sortOrder}, NOW())
     </insert>
 
-    <update id="update" parameterType="com.nakshi.rohitour.dto.CruiseItineraryScheduleDto">
-        UPDATE cruise_itinerary_schedules SET
+    <update id="update" parameterType="com.nakshi.rohitour.dto.AirItineraryScheduleDto">
+        UPDATE air_itinerary_schedules SET
             time        = #{time},
             description = #{description},
             sort_order  = #{sortOrder}
@@ -42,11 +42,11 @@
     </update>
 
     <delete id="delete">
-        DELETE FROM cruise_itinerary_schedules WHERE id = #{id}
+        DELETE FROM air_itinerary_schedules WHERE id = #{id}
     </delete>
 
     <delete id="deleteByItineraryId">
-        DELETE FROM cruise_itinerary_schedules WHERE itinerary_id = #{itineraryId}
+        DELETE FROM air_itinerary_schedules WHERE itinerary_id = #{itineraryId}
     </delete>
 
 </mapper>

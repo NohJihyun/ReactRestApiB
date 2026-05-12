@@ -163,4 +163,14 @@
         DELETE FROM reviews WHERE id = #{id}
     </delete>
 
+    <select id="findAllByProductId" resultMap="ReviewMap">
+        SELECT id, product_id, user_id, writer_type, rating, content, status, created_at, updated_at
+        FROM reviews
+        WHERE product_id = #{productId}
+    </select>
+
+    <delete id="deleteAllByProductId">
+        DELETE FROM reviews WHERE product_id = #{productId}
+    </delete>
+
 </mapper>

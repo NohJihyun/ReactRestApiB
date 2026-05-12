@@ -17,29 +17,29 @@
 
     <select id="findByItineraryId" resultMap="ImageMap">
         SELECT id, itinerary_id, product_id, image_path, image_type, sort_order, created_at
-        FROM itinerary_images
+        FROM cruise_itinerary_images
         WHERE itinerary_id = #{itineraryId}
         ORDER BY image_type ASC, sort_order ASC
     </select>
 
     <select id="findById" resultMap="ImageMap">
         SELECT id, itinerary_id, product_id, image_path, image_type, sort_order, created_at
-        FROM itinerary_images
+        FROM cruise_itinerary_images
         WHERE id = #{id}
     </select>
 
     <insert id="insert" parameterType="com.nakshi.rohitour.dto.CruiseItineraryImageDto"
             useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-        INSERT INTO itinerary_images (itinerary_id, product_id, image_path, image_type, sort_order, created_at)
+        INSERT INTO cruise_itinerary_images (itinerary_id, product_id, image_path, image_type, sort_order, created_at)
         VALUES (#{itineraryId}, #{productId}, #{imagePath}, #{imageType}, #{sortOrder}, NOW())
     </insert>
 
     <delete id="delete">
-        DELETE FROM itinerary_images WHERE id = #{id}
+        DELETE FROM cruise_itinerary_images WHERE id = #{id}
     </delete>
 
     <delete id="deleteByItineraryId">
-        DELETE FROM itinerary_images WHERE itinerary_id = #{itineraryId}
+        DELETE FROM cruise_itinerary_images WHERE itinerary_id = #{itineraryId}
     </delete>
 
 </mapper>
