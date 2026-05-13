@@ -2,12 +2,16 @@ package com.nakshi.rohitour.repository.user;
 
 import com.nakshi.rohitour.domain.user.AuthProvider;
 import com.nakshi.rohitour.domain.user.User;
+import com.nakshi.rohitour.domain.user.UserRole;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
 
 /*
- * findByEmail 호출처리 
+ * findByEmail 호출처리
  */
 public interface UserRepository extends JpaRepository<User, Long> {
     //Optional<T> 값 유/무 표현 래퍼클래스
@@ -24,4 +28,33 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByNameAndPhoneAndProvider(String name, String phone, AuthProvider provider);
 
     Optional<User> findByProviderAndProviderId(AuthProvider provider, String providerId);
+
+    Page<User> findByNameContainingIgnoreCaseOrLoginIdContainingIgnoreCase(String name, String loginId, Pageable pageable);
+
+    long countByIsActive(Boolean isActive);
+
+    long countByRole(UserRole role);
+
+    @Query(value = """
+        SELECT TO_CHAR(DATE_TRUNC('month', created_at), 'YYYY-MM') AS month,
+               COUNT(*)::int AS cnt
+        FROM users
+        WHERE created_at >= NOW() - INTERVAL '12 months'
+        GROUP BY month
+        ORDER BY month
+        """, nativeQuery = true)
+    java.util.List<Object[]> findMonthlyRegistrations();
+
+    @Query(value = """
+        SELECT EXTRACT(YEAR FROM created_at)::int AS yr,
+               COUNT(*)::int AS cnt
+        FROM users
+        WHERE created_at >= NOW() - INTERVAL '5 years'
+        GROUP BY yr
+        ORDER BY yr
+        """, nativeQuery = true)
+    java.util.List<Object[]> findYearlyRegistrations();
+
+    @Query(value = "SELECT provider, COUNT(*)::int AS cnt FROM users GROUP BY provider ORDER BY cnt DESC", nativeQuery = true)
+    java.util.List<Object[]> findCountByProvider();
 }

@@ -24,4 +24,7 @@ public interface ReviewMapper {
     void delete(@Param("id") Long id);
     List<ReviewDto> findAllByProductId(@Param("productId") Long productId);
     void deleteAllByProductId(@Param("productId") Long productId);
+
+    int countAllReviews();
+    int countReviewsByStatus(@Param("status") String status);
 }

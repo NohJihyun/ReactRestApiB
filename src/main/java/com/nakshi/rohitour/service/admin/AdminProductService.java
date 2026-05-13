@@ -54,6 +54,11 @@ public class AdminProductService {
         return productMapper.findById(id);
     }
 
+    /* 상품이 등록된 카테고리 ID 목록 */
+    public List<Long> findDistinctCategoryIds() {
+        return productMapper.findDistinctCategoryIds();
+    }
+
     /* 등록 */
     public int insert(ProductDto dto) {
         int count = productMapper.countByCode(dto.getProductCode(), null);

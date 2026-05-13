@@ -173,4 +173,13 @@
         DELETE FROM reviews WHERE product_id = #{productId}
     </delete>
 
+    <!-- 대시보드 통계용: 전체 후기 수 -->
+    <select id="countAllReviews" resultType="int">
+        SELECT COUNT(*) FROM reviews
+    </select>
+
+    <select id="countReviewsByStatus" resultType="int">
+        SELECT COUNT(*) FROM reviews WHERE status = #{status}
+    </select>
+
 </mapper>

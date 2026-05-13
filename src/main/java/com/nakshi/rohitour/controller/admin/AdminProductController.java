@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.Map;
 
 @CrossOrigin(origins = "http://localhost:3000")
@@ -39,6 +40,12 @@ public class AdminProductController {
             ProductSearchDto searchDto
     ) {
         return productService.findAll(new PageRequest(page, size), searchDto);
+    }
+
+    /* 상품이 등록된 카테고리 ID 목록 */
+    @GetMapping("/used-categories")
+    public List<Long> getUsedCategoryIds() {
+        return productService.findDistinctCategoryIds();
     }
 
     /* 단건 조회 */

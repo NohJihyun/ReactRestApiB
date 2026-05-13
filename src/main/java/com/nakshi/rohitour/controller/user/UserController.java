@@ -1,6 +1,7 @@
 package com.nakshi.rohitour.controller.user;
 
 import com.nakshi.rohitour.dto.AgreeTermsRequest;
+import com.nakshi.rohitour.repository.user.UserRepository;
 import com.nakshi.rohitour.service.auth.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 public class UserController {
 
     private final AuthService authService;
+    private final UserRepository userRepository;
 
     @GetMapping("/me")
     public MeResponse me(Authentication authentication) {
@@ -24,7 +26,7 @@ public class UserController {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthenticated");
         }
 
-        String email = authentication.getName();
+        String loginId = authentication.getName();
 
         String role = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -32,7 +34,11 @@ public class UserController {
                 .map(authority -> authority.replace("ROLE_", ""))
                 .orElse("USER");
 
-        return new MeResponse(email, role);
+        String name = userRepository.findByLoginId(loginId)
+                .map(u -> u.getName())
+                .orElse(null);
+
+        return new MeResponse(loginId, name, role);
     }
 
     /**
@@ -47,5 +53,5 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    public record MeResponse(String email, String role) {}
+    public record MeResponse(String loginId, String name, String role) {}
 }

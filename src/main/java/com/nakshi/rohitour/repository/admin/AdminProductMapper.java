@@ -38,4 +38,10 @@ public interface AdminProductMapper {
     int deactivate(Long id);
 
     int delete(Long id);
+
+    int countAllActive();
+
+    int countProductsByStatus(String status);
+
+    List<Long> findDistinctCategoryIds();
 }

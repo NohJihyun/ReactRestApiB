@@ -12,6 +12,7 @@ public class ProductDto {
     private Long productId;
     private Long categoryId;
     private String categoryName;        // JOIN 결과, 목록 표시용
+    private String rootCategoryName;    // 대분류명 (depth=1)
 
     private String productCode;
     private String productName;
