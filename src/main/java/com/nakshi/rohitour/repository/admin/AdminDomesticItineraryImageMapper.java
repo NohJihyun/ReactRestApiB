@@ -11,6 +11,8 @@ public interface AdminDomesticItineraryImageMapper {
 
     List<DomesticItineraryImageDto> findByItineraryId(@Param("itineraryId") Long itineraryId);
 
+    List<DomesticItineraryImageDto> findByScheduleId(@Param("scheduleId") Long scheduleId);
+
     DomesticItineraryImageDto findById(@Param("id") Long id);
 
     int insert(DomesticItineraryImageDto dto);

@@ -12,6 +12,7 @@ public class DomesticItineraryImageDto {
 
     private Long id;
     private Long itineraryId;
+    private Long scheduleId;
     private Long productId;
     private String imagePath;
     private String imageType;

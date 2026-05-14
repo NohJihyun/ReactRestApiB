@@ -38,11 +38,15 @@ public class AdminCruiseItineraryService {
         this.scheduleMapper = scheduleMapper;
     }
 
-    /* 일정 목록 (스케줄 + 이미지 포함) */
+    /* 일정 목록 (스케줄 + 스케줄별 이미지 포함) */
     public List<CruiseItineraryDto> getItineraries(Long productId) {
         List<CruiseItineraryDto> list = itineraryMapper.findByProductId(productId);
         for (CruiseItineraryDto dto : list) {
-            dto.setSchedules(scheduleMapper.findByItineraryId(dto.getId()));
+            List<CruiseItineraryScheduleDto> schedules = scheduleMapper.findByItineraryId(dto.getId());
+            for (CruiseItineraryScheduleDto schedule : schedules) {
+                schedule.setImages(imageMapper.findByScheduleId(schedule.getId()));
+            }
+            dto.setSchedules(schedules);
             dto.setImages(imageMapper.findByItineraryId(dto.getId()));
         }
         return list;
@@ -130,7 +134,7 @@ public class AdminCruiseItineraryService {
         scheduleMapper.delete(scheduleId);
     }
 
-    /* 이미지 업로드 */
+    /* 이미지 업로드 (일정 단위 — 하위 호환용) */
     public CruiseItineraryImageDto uploadImage(
             Long productId, Long itineraryId, MultipartFile file, String imageType
     ) throws IOException {
@@ -142,6 +146,24 @@ public class AdminCruiseItineraryService {
         dto.setProductId(productId);
         dto.setImagePath(relativePath);
         dto.setImageType(imageType);
+        dto.setSortOrder(sortOrder);
+        imageMapper.insert(dto);
+        return dto;
+    }
+
+    /* 스케줄별 이미지 업로드 */
+    public CruiseItineraryImageDto uploadScheduleImage(
+            Long productId, Long itineraryId, Long scheduleId, MultipartFile file
+    ) throws IOException {
+        String relativePath = saveFile(productId, file, "schedule");
+        int sortOrder = imageMapper.findByScheduleId(scheduleId).size();
+
+        CruiseItineraryImageDto dto = new CruiseItineraryImageDto();
+        dto.setItineraryId(itineraryId);
+        dto.setScheduleId(scheduleId);
+        dto.setProductId(productId);
+        dto.setImagePath(relativePath);
+        dto.setImageType("SCHEDULE");
         dto.setSortOrder(sortOrder);
         imageMapper.insert(dto);
         return dto;

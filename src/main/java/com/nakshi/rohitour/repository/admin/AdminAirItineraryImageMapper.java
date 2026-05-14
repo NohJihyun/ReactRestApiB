@@ -11,6 +11,8 @@ public interface AdminAirItineraryImageMapper {
 
     List<AirItineraryImageDto> findByItineraryId(@Param("itineraryId") Long itineraryId);
 
+    List<AirItineraryImageDto> findByScheduleId(@Param("scheduleId") Long scheduleId);
+
     AirItineraryImageDto findById(@Param("id") Long id);
 
     int insert(AirItineraryImageDto dto);

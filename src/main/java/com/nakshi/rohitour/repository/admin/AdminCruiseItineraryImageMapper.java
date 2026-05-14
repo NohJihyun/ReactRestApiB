@@ -11,6 +11,8 @@ public interface AdminCruiseItineraryImageMapper {
 
     List<CruiseItineraryImageDto> findByItineraryId(@Param("itineraryId") Long itineraryId);
 
+    List<CruiseItineraryImageDto> findByScheduleId(@Param("scheduleId") Long scheduleId);
+
     CruiseItineraryImageDto findById(@Param("id") Long id);
 
     int insert(CruiseItineraryImageDto dto);

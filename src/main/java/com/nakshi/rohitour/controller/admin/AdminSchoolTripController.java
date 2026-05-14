@@ -134,6 +134,26 @@ public class AdminSchoolTripController {
         itineraryService.deleteImage(imageId);
     }
 
+    @PostMapping(value = "/school-trip-itineraries/{itineraryId}/schedules/{scheduleId}/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public SchoolTripItineraryImageDto uploadScheduleImage(
+            @PathVariable Long productId,
+            @PathVariable Long itineraryId,
+            @PathVariable Long scheduleId,
+            @RequestParam("file") MultipartFile file
+    ) throws IOException {
+        return itineraryService.uploadScheduleImage(productId, itineraryId, scheduleId, file);
+    }
+
+    @DeleteMapping("/school-trip-itineraries/{itineraryId}/schedules/{scheduleId}/images/{imageId}")
+    public void deleteScheduleImage(
+            @PathVariable Long productId,
+            @PathVariable Long itineraryId,
+            @PathVariable Long scheduleId,
+            @PathVariable Long imageId
+    ) throws IOException {
+        itineraryService.deleteImage(imageId);
+    }
+
     /* ── 수학여행 상세 ── */
 
     @GetMapping("/school-trip-details")

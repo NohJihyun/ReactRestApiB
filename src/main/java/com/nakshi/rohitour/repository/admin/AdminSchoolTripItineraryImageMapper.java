@@ -11,6 +11,8 @@ public interface AdminSchoolTripItineraryImageMapper {
 
     List<SchoolTripItineraryImageDto> findByItineraryId(@Param("itineraryId") Long itineraryId);
 
+    List<SchoolTripItineraryImageDto> findByScheduleId(@Param("scheduleId") Long scheduleId);
+
     SchoolTripItineraryImageDto findById(@Param("id") Long id);
 
     int insert(SchoolTripItineraryImageDto dto);

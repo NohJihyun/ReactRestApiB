@@ -8,6 +8,7 @@
     <resultMap id="ImageMap" type="com.nakshi.rohitour.dto.DomesticItineraryImageDto">
         <id     property="id"           column="id"/>
         <result property="itineraryId"  column="itinerary_id"/>
+        <result property="scheduleId"   column="schedule_id"/>
         <result property="productId"    column="product_id"/>
         <result property="imagePath"    column="image_path"/>
         <result property="imageType"    column="image_type"/>
@@ -16,22 +17,29 @@
     </resultMap>
 
     <select id="findByItineraryId" resultMap="ImageMap">
-        SELECT id, itinerary_id, product_id, image_path, image_type, sort_order, created_at
+        SELECT id, itinerary_id, schedule_id, product_id, image_path, image_type, sort_order, created_at
         FROM domestic_itinerary_images
         WHERE itinerary_id = #{itineraryId}
         ORDER BY image_type ASC, sort_order ASC
     </select>
 
+    <select id="findByScheduleId" resultMap="ImageMap">
+        SELECT id, itinerary_id, schedule_id, product_id, image_path, image_type, sort_order, created_at
+        FROM domestic_itinerary_images
+        WHERE schedule_id = #{scheduleId}
+        ORDER BY sort_order ASC
+    </select>
+
     <select id="findById" resultMap="ImageMap">
-        SELECT id, itinerary_id, product_id, image_path, image_type, sort_order, created_at
+        SELECT id, itinerary_id, schedule_id, product_id, image_path, image_type, sort_order, created_at
         FROM domestic_itinerary_images
         WHERE id = #{id}
     </select>
 
     <insert id="insert" parameterType="com.nakshi.rohitour.dto.DomesticItineraryImageDto"
             useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-        INSERT INTO domestic_itinerary_images (itinerary_id, product_id, image_path, image_type, sort_order, created_at)
-        VALUES (#{itineraryId}, #{productId}, #{imagePath}, #{imageType}, #{sortOrder}, NOW())
+        INSERT INTO domestic_itinerary_images (itinerary_id, schedule_id, product_id, image_path, image_type, sort_order, created_at)
+        VALUES (#{itineraryId}, #{scheduleId}, #{productId}, #{imagePath}, #{imageType}, #{sortOrder}, NOW())
     </insert>
 
     <delete id="delete">

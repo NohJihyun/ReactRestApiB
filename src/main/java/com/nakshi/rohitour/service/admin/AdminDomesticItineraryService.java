@@ -41,7 +41,11 @@ public class AdminDomesticItineraryService {
     public List<DomesticItineraryDto> getItineraries(Long productId) {
         List<DomesticItineraryDto> list = itineraryMapper.findByProductId(productId);
         for (DomesticItineraryDto dto : list) {
-            dto.setSchedules(scheduleMapper.findByItineraryId(dto.getId()));
+            List<DomesticItineraryScheduleDto> schedules = scheduleMapper.findByItineraryId(dto.getId());
+            for (DomesticItineraryScheduleDto schedule : schedules) {
+                schedule.setImages(imageMapper.findByScheduleId(schedule.getId()));
+            }
+            dto.setSchedules(schedules);
             dto.setImages(imageMapper.findByItineraryId(dto.getId()));
         }
         return list;
@@ -136,6 +140,23 @@ public class AdminDomesticItineraryService {
         dto.setProductId(productId);
         dto.setImagePath(relativePath);
         dto.setImageType(imageType);
+        dto.setSortOrder(sortOrder);
+        imageMapper.insert(dto);
+        return dto;
+    }
+
+    public DomesticItineraryImageDto uploadScheduleImage(
+            Long productId, Long itineraryId, Long scheduleId, MultipartFile file
+    ) throws IOException {
+        String relativePath = saveFile(productId, file, "schedule");
+        int sortOrder = imageMapper.findByScheduleId(scheduleId).size();
+
+        DomesticItineraryImageDto dto = new DomesticItineraryImageDto();
+        dto.setItineraryId(itineraryId);
+        dto.setScheduleId(scheduleId);
+        dto.setProductId(productId);
+        dto.setImagePath(relativePath);
+        dto.setImageType("SCHEDULE");
         dto.setSortOrder(sortOrder);
         imageMapper.insert(dto);
         return dto;

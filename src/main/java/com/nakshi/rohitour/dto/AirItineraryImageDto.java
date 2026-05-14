@@ -12,9 +12,10 @@ public class AirItineraryImageDto {
 
     private Long id;
     private Long itineraryId;
+    private Long scheduleId;
     private Long productId;
     private String imagePath;
-    private String imageType;  // LOCATION / HOTEL
+    private String imageType;
     private int sortOrder;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")

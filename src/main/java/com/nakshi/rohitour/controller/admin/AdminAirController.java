@@ -134,6 +134,26 @@ public class AdminAirController {
         itineraryService.deleteImage(imageId);
     }
 
+    @PostMapping(value = "/air-itineraries/{itineraryId}/schedules/{scheduleId}/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public AirItineraryImageDto uploadScheduleImage(
+            @PathVariable Long productId,
+            @PathVariable Long itineraryId,
+            @PathVariable Long scheduleId,
+            @RequestParam("file") MultipartFile file
+    ) throws IOException {
+        return itineraryService.uploadScheduleImage(productId, itineraryId, scheduleId, file);
+    }
+
+    @DeleteMapping("/air-itineraries/{itineraryId}/schedules/{scheduleId}/images/{imageId}")
+    public void deleteScheduleImage(
+            @PathVariable Long productId,
+            @PathVariable Long itineraryId,
+            @PathVariable Long scheduleId,
+            @PathVariable Long imageId
+    ) throws IOException {
+        itineraryService.deleteImage(imageId);
+    }
+
     /* ── 항공 상세 (포함/불포함, 가이드, 가격, 항공편 정보) ── */
 
     @GetMapping("/air-details")

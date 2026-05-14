@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -15,6 +17,7 @@ public class DomesticItineraryScheduleDto {
     private String time;
     private String description;
     private int sortOrder;
+    private List<DomesticItineraryImageDto> images = new ArrayList<>();
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
