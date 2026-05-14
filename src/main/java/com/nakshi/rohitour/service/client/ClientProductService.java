@@ -104,4 +104,8 @@ public class ClientProductService {
     public SchoolTripDetailDto getSchoolTripDetail(Long productId) {
         return schoolTripDetailMapper.findByProductId(productId);
     }
+
+    public List<ProductDto> search(String keyword, int limit) {
+        return mapper.search(keyword, limit);
+    }
 }

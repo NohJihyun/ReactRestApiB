@@ -24,6 +24,16 @@ public class ClientProductController {
         return service.getByCategory(category);
     }
 
+    /** GET /api/products/search?keyword=xxx&limit=8 */
+    @GetMapping("/search")
+    public List<ProductDto> search(
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "8") int limit
+    ) {
+        if (keyword == null || keyword.trim().isEmpty()) return List.of();
+        return service.search(keyword.trim(), Math.min(limit, 50));
+    }
+
     /** GET /api/products/{id} */
     @GetMapping("/{id}")
     public ProductDto getById(@PathVariable Long id) {

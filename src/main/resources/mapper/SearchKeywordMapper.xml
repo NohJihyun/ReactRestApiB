@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.nakshi.rohitour.repository.client.SearchKeywordMapper">
+
+    <!-- 검색어 카운트 upsert -->
+    <insert id="upsert">
+        INSERT INTO search_keywords (keyword, search_count, last_searched_at)
+        VALUES (#{keyword}, 1, NOW())
+        ON CONFLICT (keyword) DO UPDATE SET
+            search_count       = search_keywords.search_count + 1,
+            last_searched_at   = NOW()
+    </insert>
+
+    <!-- 인기 검색어 조회 -->
+    <select id="findTop" resultType="com.nakshi.rohitour.dto.SearchKeywordDto">
+        SELECT keyword, search_count
+        FROM search_keywords
+        ORDER BY search_count DESC, last_searched_at DESC
+        LIMIT #{limit}
+    </select>
+
+</mapper>

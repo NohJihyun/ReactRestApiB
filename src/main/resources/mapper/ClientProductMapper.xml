@@ -6,9 +6,10 @@
 <mapper namespace="com.nakshi.rohitour.repository.client.ClientProductMapper">
 
     <resultMap id="ClientProductMap" type="com.nakshi.rohitour.dto.ProductDto">
-        <id  property="productId"      column="product_id"/>
+        <id  property="productId"        column="product_id"/>
         <result property="categoryId"     column="category_id"/>
         <result property="categoryName"   column="category_name"/>
+        <result property="rootCategoryName" column="root_category_name"/>
         <result property="productCode"    column="product_code"/>
         <result property="productName"    column="product_name"/>
         <result property="productSubname" column="product_subname"/>
@@ -145,6 +146,53 @@
         WHERE p.product_id = #{productId}
           AND p.status      = 'PUBLISHED'
           AND p.is_active   = 'Y'
+    </select>
+
+    <!-- 키워드 검색 (상품명·부제목·요약·해시태그) -->
+    <select id="search" resultMap="ClientProductMap">
+        SELECT
+            p.product_id,
+            p.category_id,
+            c.category_name,
+            root.category_name                                                              AS root_category_name,
+            p.product_name,
+            p.product_subname,
+            p.summary,
+            p.status,
+            p.is_featured,
+            p.travel_type,
+            p.price_per_person,
+            p.transport_type,
+            p.departure_location,
+            p.departure_at,
+            p.arrival_location,
+            p.arrival_at,
+            p.hashtags,
+            p.created_at,
+            thumb.image_path                                                                AS thumbnail_path
+        FROM products p
+        LEFT JOIN categories c    ON p.category_id = c.category_id
+        LEFT JOIN categories root ON (
+            (c.depth = 1 AND c.category_id = root.category_id)
+            OR
+            (c.depth = 2 AND c.parent_id   = root.category_id)
+        )
+        LEFT JOIN product_images thumb ON thumb.product_id = p.product_id
+                                      AND thumb.image_type = 'THUMBNAIL'
+        WHERE p.status    = 'PUBLISHED'
+          AND p.is_active = 'Y'
+          AND root.depth  = 1
+          AND (
+              p.product_name    ILIKE '%' || #{keyword} || '%'
+              OR p.product_subname ILIKE '%' || #{keyword} || '%'
+              OR p.summary         ILIKE '%' || #{keyword} || '%'
+              OR p.hashtags        ILIKE '%' || #{keyword} || '%'
+              OR root.category_name   ILIKE '%' || #{keyword} || '%'
+              OR c.category_name     ILIKE '%' || #{keyword} || '%'
+              OR p.arrival_location  ILIKE '%' || #{keyword} || '%'
+          )
+        ORDER BY p.is_featured DESC, p.created_at DESC
+        LIMIT #{limit}
     </select>
 
     <!-- 상품 이미지 목록 -->

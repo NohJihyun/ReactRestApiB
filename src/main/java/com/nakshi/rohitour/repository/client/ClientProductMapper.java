@@ -22,4 +22,7 @@ public interface ClientProductMapper {
 
     /** 상품 첨부파일 목록 */
     List<ProductFileDto> findFilesByProductId(@Param("productId") Long productId);
+
+    /** 키워드 검색 (상품명·부제목·요약·해시태그·카테고리·목적지) */
+    List<ProductDto> search(@Param("keyword") String keyword, @Param("limit") int limit);
 }

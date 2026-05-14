@@ -78,6 +78,9 @@ public class SecurityConfig {
                         // 클라이언트 공개 상품 API
                         .requestMatchers("/api/products/**").permitAll()
 
+                        // 검색어 로그 + 인기 검색어
+                        .requestMatchers("/api/search/**").permitAll()
+
                         // 관리자 API
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
