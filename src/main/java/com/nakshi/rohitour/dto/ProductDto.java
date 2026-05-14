@@ -64,6 +64,7 @@ public class ProductDto {
 
     private String seoTitle;
     private String seoDescription;
+    private Integer confirmedCount;
     private Integer viewCount;
     private Long createdBy;
     private Long updatedBy;

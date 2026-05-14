@@ -35,6 +35,7 @@
         <result property="arrivalLocation"   column="arrival_location"/>
         <result property="arrivalAt"         column="arrival_at"/>
         <result property="hashtags"          column="hashtags"/>
+        <result property="confirmedCount" column="confirmed_count"/>
         <result property="thumbnailPath"  column="thumbnail_path"/>
         <result property="imageCount"     column="image_count"/>
         <result property="fileCount"      column="file_count"/>
@@ -82,6 +83,7 @@
             p.arrival_location,
             p.arrival_at,
             p.hashtags,
+            p.confirmed_count,
             p.exposure_end_at,
             p.created_at,
             thumb.image_path                                                               AS thumbnail_path,
@@ -133,6 +135,7 @@
             p.arrival_location,
             p.arrival_at,
             p.hashtags,
+            p.confirmed_count,
             p.exposure_start_at,
             p.exposure_end_at,
             p.created_at,
@@ -168,6 +171,7 @@
             p.arrival_location,
             p.arrival_at,
             p.hashtags,
+            p.confirmed_count,
             p.created_at,
             thumb.image_path                                                                AS thumbnail_path
         FROM products p
