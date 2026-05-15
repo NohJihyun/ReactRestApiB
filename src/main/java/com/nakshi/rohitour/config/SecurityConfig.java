@@ -81,6 +81,9 @@ public class SecurityConfig {
                         // 검색어 로그 + 인기 검색어
                         .requestMatchers("/api/search/**").permitAll()
 
+                        // 예약 신청 (로그인 필수)
+                        .requestMatchers(HttpMethod.POST, "/api/bookings").authenticated()
+
                         // 관리자 API
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/admin/**").hasRole("ADMIN")

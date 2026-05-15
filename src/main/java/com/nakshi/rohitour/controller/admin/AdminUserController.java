@@ -5,6 +5,7 @@ import com.nakshi.rohitour.domain.user.User;
 import com.nakshi.rohitour.domain.user.UserRole;
 import com.nakshi.rohitour.repository.admin.AdminProductMapper;
 import com.nakshi.rohitour.repository.auth.RefreshTokenRepository;
+import com.nakshi.rohitour.repository.booking.BookingMapper;
 import com.nakshi.rohitour.repository.review.ReviewMapper;
 import com.nakshi.rohitour.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,7 @@ public class AdminUserController {
     private final AdminProductMapper productMapper;
     private final ReviewMapper reviewMapper;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final BookingMapper bookingMapper;
 
     @GetMapping("/users")
     public Map<String, Object> getUsers(
@@ -79,6 +81,8 @@ public class AdminUserController {
         int  publishedReviews   = reviewMapper.countReviewsByStatus("PUBLISHED");
         int  hiddenReviews      = reviewMapper.countReviewsByStatus("HIDDEN");
         long activeSessionCount = refreshTokenRepository.countByRevokedFalseAndExpiresAtAfter(LocalDateTime.now());
+        int  reservedPeople     = bookingMapper.sumReservedPeople();
+        int  confirmedPeople    = bookingMapper.sumConfirmedPeople();
 
         List<Map<String, Object>> monthly = userRepository.findMonthlyRegistrations().stream()
                 .map(row -> {
@@ -108,7 +112,8 @@ public class AdminUserController {
                 totalUsers, activeUsers, adminCount, userCount,
                 totalProducts, publishedProducts, draftProducts, hiddenProducts, endedProducts,
                 totalReviews, publishedReviews, hiddenReviews,
-                activeSessionCount, monthly, yearly, providerStats);
+                activeSessionCount, monthly, yearly, providerStats,
+                reservedPeople, confirmedPeople);
     }
 
     public record UserDto(
@@ -136,5 +141,7 @@ public class AdminUserController {
             long activeSessionCount,
             List<Map<String, Object>> monthlyRegistrations,
             List<Map<String, Object>> yearlyRegistrations,
-            List<Map<String, Object>> providerStats) {}
+            List<Map<String, Object>> providerStats,
+            int reservedPeople,
+            int confirmedPeople) {}
 }

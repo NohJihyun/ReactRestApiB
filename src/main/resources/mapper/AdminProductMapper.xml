@@ -45,6 +45,7 @@
         <result property="fileCount"       column="file_count"/>
         <result property="itineraryCount"  column="itinerary_count"/>
         <result property="hasDetail"       column="has_detail"/>
+        <result property="reservedCount"   column="reserved_count"/>
         <result property="confirmedCount"  column="confirmed_count"/>
         <result property="createdBy"       column="created_by"/>
         <result property="updatedBy"       column="updated_by"/>
@@ -85,6 +86,7 @@
                 EXISTS (SELECT 1 FROM domestic_details    WHERE product_id = p.product_id) OR
                 EXISTS (SELECT 1 FROM school_trip_details WHERE product_id = p.product_id)
             ) AS has_detail,
+            p.reserved_count,
             p.confirmed_count
         FROM products p
         LEFT JOIN categories c      ON p.category_id = c.category_id
@@ -177,6 +179,7 @@
             p.arrival_location,
             p.arrival_at,
             p.hashtags,
+            p.reserved_count,
             p.confirmed_count,
             p.created_by,
             p.updated_by,
@@ -230,6 +233,7 @@
             arrival_location,
             arrival_at,
             hashtags,
+            reserved_count,
             confirmed_count,
             created_by,
             updated_by,
@@ -265,6 +269,7 @@
             #{arrivalLocation},
             #{arrivalAt},
             #{hashtags},
+            #{reservedCount},
             #{confirmedCount},
             #{createdBy},
             #{updatedBy},
@@ -303,6 +308,7 @@
             arrival_location   = #{arrivalLocation},
             arrival_at         = #{arrivalAt},
             hashtags           = #{hashtags},
+            reserved_count     = #{reservedCount},
             confirmed_count    = #{confirmedCount},
             updated_by         = #{updatedBy},
             updated_at         = NOW()
