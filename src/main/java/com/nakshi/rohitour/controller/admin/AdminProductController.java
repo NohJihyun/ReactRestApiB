@@ -35,8 +35,8 @@ public class AdminProductController {
     /* 목록 조회 */
     @GetMapping
     public PageResponse<ProductDto> findAll(
-            @RequestParam int page,
-            @RequestParam int size,
+            @RequestParam(defaultValue = "1")  int page,
+            @RequestParam(defaultValue = "20") int size,
             ProductSearchDto searchDto
     ) {
         return productService.findAll(new PageRequest(page, size), searchDto);

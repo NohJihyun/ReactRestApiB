@@ -5,9 +5,16 @@ import com.nakshi.rohitour.dto.BookingDto;
 import com.nakshi.rohitour.dto.BookingSearchDto;
 import com.nakshi.rohitour.service.booking.BookingService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 @RestController
@@ -42,6 +49,12 @@ public class AdminBookingController {
         return bookingService.getBooking(id);
     }
 
+    /* 예약 통계 (상태별 + 상품별) */
+    @GetMapping("/stats")
+    public Map<String, Object> getStats() {
+        return bookingService.getStats();
+    }
+
     /* 미확인 신규 예약 수 (알림 뱃지) */
     @GetMapping("/new-count")
     public Map<String, Integer> getUncheckedCount() {
@@ -54,6 +67,15 @@ public class AdminBookingController {
             @PathVariable Long id,
             @RequestBody Map<String, String> body) {
         bookingService.updateStatus(id, body.get("status"));
+        return ResponseEntity.ok().build();
+    }
+
+    /* 결제 상태 변경 */
+    @PatchMapping("/{id}/payment")
+    public ResponseEntity<Void> updatePaymentStatus(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> body) {
+        bookingService.updatePaymentStatus(id, body.get("paymentStatus"), body.get("paymentMethod"));
         return ResponseEntity.ok().build();
     }
 
@@ -71,5 +93,30 @@ public class AdminBookingController {
     public ResponseEntity<Void> markChecked(@PathVariable Long id) {
         bookingService.markChecked(id);
         return ResponseEntity.ok().build();
+    }
+
+    /* 예약 내역 엑셀 다운로드 */
+    @GetMapping("/export")
+    public ResponseEntity<byte[]> exportExcel(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String paymentStatus,
+            @RequestParam(required = false) Long productId) throws IOException {
+
+        BookingSearchDto search = new BookingSearchDto();
+        search.setKeyword(keyword);
+        search.setStatus(status);
+        search.setPaymentStatus(paymentStatus);
+        search.setProductId(productId);
+
+        byte[] bytes = bookingService.exportToExcel(search);
+        String filename = "예약내역_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmm")) + ".xlsx";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+        headers.setContentDisposition(ContentDisposition.attachment()
+                .filename(filename, StandardCharsets.UTF_8).build());
+
+        return ResponseEntity.ok().headers(headers).body(bytes);
     }
 }

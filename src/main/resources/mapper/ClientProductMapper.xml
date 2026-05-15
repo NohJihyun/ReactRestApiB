@@ -86,7 +86,7 @@
             p.hashtags,
             (COALESCE(p.reserved_count, 0) +
              (SELECT COALESCE(SUM(b.adult_count + b.child_count + b.infant_count), 0)
-              FROM bookings b WHERE b.product_id = p.product_id AND b.status IN ('PENDING','CONFIRMED'))) AS reserved_count,
+              FROM bookings b WHERE b.product_id = p.product_id AND b.status = 'PENDING')) AS reserved_count,
             (COALESCE(p.confirmed_count, 0) +
              (SELECT COALESCE(SUM(b.adult_count + b.child_count + b.infant_count), 0)
               FROM bookings b WHERE b.product_id = p.product_id AND b.status = 'CONFIRMED'))             AS confirmed_count,
@@ -143,7 +143,7 @@
             p.hashtags,
             (COALESCE(p.reserved_count, 0) +
              (SELECT COALESCE(SUM(b.adult_count + b.child_count + b.infant_count), 0)
-              FROM bookings b WHERE b.product_id = p.product_id AND b.status IN ('PENDING','CONFIRMED'))) AS reserved_count,
+              FROM bookings b WHERE b.product_id = p.product_id AND b.status = 'PENDING')) AS reserved_count,
             (COALESCE(p.confirmed_count, 0) +
              (SELECT COALESCE(SUM(b.adult_count + b.child_count + b.infant_count), 0)
               FROM bookings b WHERE b.product_id = p.product_id AND b.status = 'CONFIRMED'))             AS confirmed_count,
@@ -184,7 +184,7 @@
             p.hashtags,
             (COALESCE(p.reserved_count, 0) +
              (SELECT COALESCE(SUM(b.adult_count + b.child_count + b.infant_count), 0)
-              FROM bookings b WHERE b.product_id = p.product_id AND b.status IN ('PENDING','CONFIRMED'))) AS reserved_count,
+              FROM bookings b WHERE b.product_id = p.product_id AND b.status = 'PENDING')) AS reserved_count,
             (COALESCE(p.confirmed_count, 0) +
              (SELECT COALESCE(SUM(b.adult_count + b.child_count + b.infant_count), 0)
               FROM bookings b WHERE b.product_id = p.product_id AND b.status = 'CONFIRMED'))             AS confirmed_count,

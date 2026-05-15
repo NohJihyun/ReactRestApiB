@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface BookingMapper {
@@ -16,10 +17,12 @@ public interface BookingMapper {
 
     List<BookingDto> findAll(BookingSearchDto search);
     int countAll(BookingSearchDto search);
+    List<BookingDto> findAllForExport(BookingSearchDto search);
 
     BookingDto findById(Long bookingId);
 
     void updateStatus(@Param("bookingId") Long bookingId, @Param("status") String status);
+    void updatePaymentStatus(@Param("bookingId") Long bookingId, @Param("paymentStatus") String paymentStatus, @Param("paymentMethod") String paymentMethod);
     void updateAdminMemo(@Param("bookingId") Long bookingId, @Param("adminMemo") String adminMemo);
     void markChecked(Long bookingId);
 
@@ -27,8 +30,12 @@ public interface BookingMapper {
 
     List<BookingDto> findByUserId(Long userId);
 
-    int sumReservedPeople();   // PENDING + CONFIRMED 인원 합계
-    int sumConfirmedPeople();  // CONFIRMED 인원 합계
+    int sumReservedPeople();
+    int sumConfirmedPeople();
+
+    List<Map<String, Object>> countByStatus();
+    List<Map<String, Object>> countByPaymentStatus();
+    List<Map<String, Object>> countByProduct();
 
     void update(@Param("bookingId") Long bookingId,
                 @Param("req") BookingRequestDto req,

@@ -15,6 +15,7 @@ public class BookingDto {
     private String userLoginId;
     private Long productId;
     private String productName;
+    private String rootCategoryName;
     private String name;
     private String phone;
     private String email;
