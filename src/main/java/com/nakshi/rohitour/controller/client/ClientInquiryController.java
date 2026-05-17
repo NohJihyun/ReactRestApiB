@@ -45,15 +45,18 @@ public class ClientInquiryController {
     }
 
     private Long resolveUserId(Authentication authentication) {
-        String loginId = authentication.getName();
-        return userRepository.findByLoginId(loginId)
+        String name = authentication.getName();
+        return userRepository.findByEmail(name)
+                .or(() -> userRepository.findByLoginId(name))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED))
                 .getUserId();
     }
 
     private Long resolveUserIdOrNull(Authentication authentication) {
         if (authentication == null || authentication instanceof AnonymousAuthenticationToken) return null;
-        return userRepository.findByLoginId(authentication.getName())
+        String name = authentication.getName();
+        return userRepository.findByEmail(name)
+                .or(() -> userRepository.findByLoginId(name))
                 .map(u -> u.getUserId())
                 .orElse(null);
     }

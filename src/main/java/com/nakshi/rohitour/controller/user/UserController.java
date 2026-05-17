@@ -26,7 +26,7 @@ public class UserController {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthenticated");
         }
 
-        String loginId = authentication.getName();
+        String subject = authentication.getName();
 
         String role = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -34,9 +34,12 @@ public class UserController {
                 .map(authority -> authority.replace("ROLE_", ""))
                 .orElse("USER");
 
-        String name = userRepository.findByLoginId(loginId)
-                .map(u -> u.getName())
+        var user = userRepository.findByEmail(subject)
+                .or(() -> userRepository.findByLoginId(subject))
                 .orElse(null);
+
+        String loginId = user != null ? user.getLoginId() : subject;
+        String name    = user != null ? user.getName()    : null;
 
         return new MeResponse(loginId, name, role);
     }

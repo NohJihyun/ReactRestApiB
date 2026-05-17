@@ -61,8 +61,9 @@ public class BookingController {
     }
 
     private Long resolveUserId(Authentication authentication) {
-        String loginId = authentication.getName();
-        return userRepository.findByLoginId(loginId)
+        String name = authentication.getName();
+        return userRepository.findByEmail(name)
+                .or(() -> userRepository.findByLoginId(name))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED))
                 .getUserId();
     }
