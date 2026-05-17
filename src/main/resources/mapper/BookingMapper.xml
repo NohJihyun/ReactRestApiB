@@ -179,7 +179,9 @@
     <!-- 상태 변경 -->
     <update id="updateStatus">
         UPDATE bookings
-        SET status = #{status}, updated_at = NOW()
+        SET status = #{status},
+            admin_checked = CASE WHEN #{status} = 'PENDING' THEN false ELSE admin_checked END,
+            updated_at = NOW()
         WHERE booking_id = #{bookingId}
     </update>
 

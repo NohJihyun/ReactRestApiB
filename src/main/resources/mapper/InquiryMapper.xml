@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nakshi.rohitour.repository.inquiry.InquiryMapper">
+
+    <resultMap id="InquiryResultMap" type="com.nakshi.rohitour.dto.InquiryDto">
+        <id     property="inquiryId"  column="inquiry_id"/>
+        <result property="userId"     column="user_id"/>
+        <result property="name"       column="name"/>
+        <result property="phone"      column="phone"/>
+        <result property="email"      column="email"/>
+        <result property="category"   column="category"/>
+        <result property="title"      column="title"/>
+        <result property="content"    column="content"/>
+        <result property="status"     column="status"/>
+        <result property="answer"     column="answer"/>
+        <result property="createdAt"  column="created_at"/>
+        <result property="updatedAt"  column="updated_at"/>
+    </resultMap>
+
+    <insert id="insert">
+        INSERT INTO inquiries (user_id, name, phone, email, category, title, content, status, created_at, updated_at)
+        VALUES (#{userId, jdbcType=BIGINT}, #{req.name}, #{req.phone}, #{req.email}, #{req.category}, #{req.title}, #{req.content}, 'NEW', NOW(), NOW())
+    </insert>
+
+    <select id="findAll" resultMap="InquiryResultMap">
+        SELECT * FROM inquiries
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (name ILIKE '%' || #{keyword} || '%'
+                  OR title ILIKE '%' || #{keyword} || '%'
+                  OR email ILIKE '%' || #{keyword} || '%')
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+            <if test="category != null and category != ''">
+                AND category = #{category}
+            </if>
+        </where>
+        ORDER BY created_at DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <select id="countAll" resultType="int">
+        SELECT COUNT(*) FROM inquiries
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (name ILIKE '%' || #{keyword} || '%'
+                  OR title ILIKE '%' || #{keyword} || '%'
+                  OR email ILIKE '%' || #{keyword} || '%')
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+            <if test="category != null and category != ''">
+                AND category = #{category}
+            </if>
+        </where>
+    </select>
+
+    <select id="findById" resultMap="InquiryResultMap">
+        SELECT * FROM inquiries WHERE inquiry_id = #{inquiryId}
+    </select>
+
+    <select id="findByUserId" resultMap="InquiryResultMap">
+        SELECT * FROM inquiries WHERE user_id = #{userId} ORDER BY created_at DESC
+    </select>
+
+    <update id="updateAnswer">
+        UPDATE inquiries
+        SET answer = #{answer}, status = 'COMPLETED', updated_at = NOW()
+        WHERE inquiry_id = #{inquiryId}
+    </update>
+
+    <update id="updateStatus">
+        UPDATE inquiries SET status = #{status}, updated_at = NOW()
+        WHERE inquiry_id = #{inquiryId}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM inquiries WHERE inquiry_id = #{inquiryId}
+    </delete>
+
+    <select id="countNew" resultType="int">
+        SELECT COUNT(*) FROM inquiries WHERE status = 'NEW'
+    </select>
+
+    <select id="countTotal" resultType="int">
+        SELECT COUNT(*) FROM inquiries
+    </select>
+
+    <select id="countCompleted" resultType="int">
+        SELECT COUNT(*) FROM inquiries WHERE status = 'COMPLETED'
+    </select>
+
+    <select id="countByCategory" resultType="map">
+        SELECT category, COUNT(*) AS count FROM inquiries GROUP BY category ORDER BY count DESC
+    </select>
+
+</mapper>

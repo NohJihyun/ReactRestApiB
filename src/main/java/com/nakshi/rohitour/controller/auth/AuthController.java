@@ -121,6 +121,10 @@ public class AuthController {
 
         authService.logout(refreshToken);
 
+        // 세션 무효화
+        jakarta.servlet.http.HttpSession session = request.getSession(false);
+        if (session != null) session.invalidate();
+
         // 쿠키 삭제
         Cookie deleteCookie = new Cookie("refreshToken", "");
         deleteCookie.setHttpOnly(true);

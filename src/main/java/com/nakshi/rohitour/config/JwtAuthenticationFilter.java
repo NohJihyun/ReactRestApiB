@@ -53,8 +53,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String header = request.getHeader("Authorization");
 
-        // Bearer 토큰이 없으면 기존 인증(세션 등) 유지
         if (header == null || !header.startsWith("Bearer ")) {
+            // API/admin 경로는 JWT 전용 — 세션 인증이 스며들지 않도록 컨텍스트 초기화
+            String path = request.getRequestURI();
+            if (path.startsWith("/api/") || path.startsWith("/admin/")) {
+                SecurityContextHolder.clearContext();
+            }
             filterChain.doFilter(request, response);
             return;
         }
