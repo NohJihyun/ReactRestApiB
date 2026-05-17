@@ -27,7 +27,7 @@ import com.nakshi.rohitour.domain.user.auth.RefreshToken;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
-import java.util.Random;
+import java.security.SecureRandom;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
@@ -197,7 +197,7 @@ public class AuthService {
         emailVerificationRepository.deleteAllByEmail(email);
 
         // 6자리 숫자 코드 생성
-        String code = String.format("%06d", new Random().nextInt(1_000_000));
+        String code = String.format("%06d", new SecureRandom().nextInt(1_000_000));
 
         EmailVerification verification = new EmailVerification(
                 email,

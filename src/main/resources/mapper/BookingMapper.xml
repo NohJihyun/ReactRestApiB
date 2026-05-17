@@ -210,7 +210,7 @@
 
     <!-- 미확인 신규 예약 수 (알림 뱃지용) -->
     <select id="countUnchecked" resultType="int">
-        SELECT COUNT(*) FROM bookings WHERE admin_checked = false
+        SELECT COUNT(*) FROM bookings WHERE admin_checked = false AND status != 'CANCELLED'
     </select>
 
     <!-- 예약 인원 합계 (PENDING만) -->

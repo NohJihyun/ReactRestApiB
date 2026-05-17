@@ -4,6 +4,7 @@ import com.nakshi.rohitour.dto.BookingDto;
 import com.nakshi.rohitour.dto.BookingRequestDto;
 import com.nakshi.rohitour.repository.user.UserRepository;
 import com.nakshi.rohitour.service.booking.BookingService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,7 @@ public class BookingController {
     /* 예약 신청 (로그인 필수) */
     @PostMapping
     public ResponseEntity<Map<String, String>> createBooking(
-            @RequestBody BookingRequestDto req,
+            @Valid @RequestBody BookingRequestDto req,
             Authentication authentication) {
         Long userId = resolveUserId(authentication);
         String bookingNumber = bookingService.createBooking(req, userId);
@@ -43,7 +44,7 @@ public class BookingController {
     @PutMapping("/{id}")
     public ResponseEntity<Void> updateBooking(
             @PathVariable Long id,
-            @RequestBody BookingRequestDto req,
+            @Valid @RequestBody BookingRequestDto req,
             Authentication authentication) {
         Long userId = resolveUserId(authentication);
         bookingService.updateBooking(id, req, userId);
