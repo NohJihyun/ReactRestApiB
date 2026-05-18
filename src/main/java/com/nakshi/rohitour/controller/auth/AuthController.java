@@ -18,6 +18,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 /**
@@ -40,6 +41,9 @@ public class AuthController {
 
     private final AuthService authService;
 
+    @Value("${app.cookie.secure:false}")
+    private boolean cookieSecure;
+
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(
             @RequestBody LoginRequest request,
@@ -55,7 +59,7 @@ public class AuthController {
         // 리프레시토큰은 URL이 아닌 쿠키헤더에 담아 응답처리 => 재발급 토큰은 브라우저가 담당
         Cookie refreshCookie = new Cookie("refreshToken", loginResponse.getRefreshToken());
         refreshCookie.setHttpOnly(true);
-        refreshCookie.setSecure(false); // 운영(HTTPS)에서는 true
+        refreshCookie.setSecure(cookieSecure);
         refreshCookie.setPath("/");
         refreshCookie.setMaxAge(60 * 60 * 24 * 7); // 7일
         response.addCookie(refreshCookie);
@@ -97,7 +101,7 @@ public class AuthController {
         if (reissue.getRefreshToken() != null) {
             Cookie refreshCookie = new Cookie("refreshToken", reissue.getRefreshToken());
             refreshCookie.setHttpOnly(true);
-            refreshCookie.setSecure(false); // 운영(HTTPS)에서는 true
+            refreshCookie.setSecure(cookieSecure);
             refreshCookie.setPath("/");
             refreshCookie.setMaxAge(60 * 60 * 24 * 7); // 7일
             response.addCookie(refreshCookie);

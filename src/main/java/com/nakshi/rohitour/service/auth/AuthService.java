@@ -70,8 +70,8 @@ public class AuthService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "비활성화된 계정입니다.");
         }
 
-        // 4️ 기존 RefreshToken 삭제 (1계정 1토큰 정책)
-        refreshTokenRepository.deleteAllByUser_UserId(user.getUserId());
+        // 4️ 기존 RefreshToken 삭제 (1계정 1토큰 정책, 동시요청 충돌 방지 위해 @Modifying JPQL 사용)
+        refreshTokenRepository.deleteAllByUserId(user.getUserId());
 
         // 5️ AccessToken 생성
         String accessToken = jwtUtil.generateAccessToken(
@@ -150,7 +150,7 @@ public class AuthService {
         String newHash = TokenHashUtil.sha256(newRefreshToken);
 
         // 1계정 1토큰 정책: 기존 토큰 삭제 후 새 토큰 저장
-        refreshTokenRepository.deleteAllByUser_UserId(user.getUserId());
+        refreshTokenRepository.deleteAllByUserId(user.getUserId());
 
         RefreshToken newEntity = new RefreshToken(
                 newHash,
@@ -176,7 +176,7 @@ public class AuthService {
             String email = jwtUtil.extractUsername(refreshToken);
 
             userRepository.findByEmail(email).ifPresent(user ->
-                    refreshTokenRepository.deleteAllByUser_UserId(user.getUserId())
+                    refreshTokenRepository.deleteAllByUserId(user.getUserId())
             );
         }
     }

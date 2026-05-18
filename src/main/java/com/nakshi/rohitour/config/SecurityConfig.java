@@ -6,6 +6,7 @@ import com.nakshi.rohitour.config.oauth2.OAuth2AuthenticationFailureHandler;
 import com.nakshi.rohitour.config.oauth2.OAuth2AuthenticationSuccessHandler;
 import com.nakshi.rohitour.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -45,6 +46,9 @@ public class SecurityConfig {
     private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
     private final ClientRegistrationRepository clientRegistrationRepository;
 
+    @Value("#{'${app.cors.allowed-origins:http://localhost:3000}'.split(',')}")
+    private List<String> corsAllowedOrigins;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
@@ -55,7 +59,10 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        // 컨트롤러 경로에 정확히 맞춤
+                        // 관리자 API — 가장 먼저, 좁은 규칙 우선
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+
+                        // 인증 API
                         .requestMatchers(HttpMethod.POST,
                                 "/api/auth/login",
                                 "/api/auth/reissue",
@@ -81,16 +88,11 @@ public class SecurityConfig {
                         // 검색어 로그 + 인기 검색어
                         .requestMatchers("/api/search/**").permitAll()
 
-                        // 문의 등록 (비로그인 허용), 신규 건수 (관리자 배지용)
+                        // 문의 등록 (비로그인 허용)
                         .requestMatchers(HttpMethod.POST, "/api/inquiries").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/admin/inquiries/new-count").hasRole("ADMIN")
 
                         // 예약 신청 (로그인 필수)
                         .requestMatchers(HttpMethod.POST, "/api/bookings").authenticated()
-
-                        // 관리자 API
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
 
                         .anyRequest().authenticated()
                 )
@@ -119,7 +121,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:3000"));
+        config.setAllowedOrigins(corsAllowedOrigins);
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);

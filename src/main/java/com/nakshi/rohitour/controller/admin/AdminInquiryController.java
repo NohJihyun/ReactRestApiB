@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/admin/inquiries")
+@RequestMapping("/api/admin/inquiries")
 @RequiredArgsConstructor
 public class AdminInquiryController {
 

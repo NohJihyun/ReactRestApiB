@@ -13,7 +13,7 @@ import java.util.List;
 // get = 조회 , post 생성 , put 전체수정, patch 부분수정
 @CrossOrigin(origins = "http://localhost:3000") // React 개발 서버 주소
 @RestController
-@RequestMapping("/admin/categories")
+@RequestMapping("/api/admin/categories")
 public class AdminCategoryController {
 
     private final AdminCategoryService categoryService;

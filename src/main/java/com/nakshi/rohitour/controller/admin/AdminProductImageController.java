@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/admin/products/{productId}/images")
+@RequestMapping("/api/admin/products/{productId}/images")
 public class AdminProductImageController {
 
     private final AdminProductImageService imageService;

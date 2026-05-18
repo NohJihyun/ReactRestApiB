@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/admin/products/{productId}")
+@RequestMapping("/api/admin/products/{productId}")
 public class AdminCruiseController {
 
     private final AdminCruiseItineraryService itineraryService;

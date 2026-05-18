@@ -39,6 +39,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     @Value("${app.frontend.url:http://localhost:3000}")
     private String frontendUrl;
 
+    @Value("${app.cookie.secure:false}")
+    private boolean cookieSecure;
+
     @Override
     @Transactional
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -59,13 +62,13 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         // RefreshToken 발급 + DB 저장 (1계정 1토큰)
         String refreshToken = jwtUtil.generateRefreshToken(user.getEmail());
         String hash = TokenHashUtil.sha256(refreshToken);
-        refreshTokenRepository.deleteAllByUser_UserId(user.getUserId());
+        refreshTokenRepository.deleteAllByUserId(user.getUserId());
         refreshTokenRepository.save(new RefreshToken(hash, LocalDateTime.now().plusDays(7), user));
 
         // RefreshToken → HttpOnly 쿠키
         Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
         refreshCookie.setHttpOnly(true);
-        refreshCookie.setSecure(false); // 운영(HTTPS)에서는 true
+        refreshCookie.setSecure(cookieSecure);
         refreshCookie.setPath("/");
         refreshCookie.setMaxAge(60 * 60 * 24 * 7);
         response.addCookie(refreshCookie);

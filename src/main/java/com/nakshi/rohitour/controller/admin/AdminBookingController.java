@@ -18,7 +18,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/admin/bookings")
+@RequestMapping("/api/admin/bookings")
 @RequiredArgsConstructor
 public class AdminBookingController {
 

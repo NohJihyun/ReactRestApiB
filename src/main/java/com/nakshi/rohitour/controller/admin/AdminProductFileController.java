@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/admin/products/{productId}/files")
+@RequestMapping("/api/admin/products/{productId}/files")
 public class AdminProductFileController {
 
     private final AdminProductFileService fileService;

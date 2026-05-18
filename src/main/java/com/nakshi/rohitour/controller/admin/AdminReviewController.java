@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/admin/reviews")
+@RequestMapping("/api/admin/reviews")
 @RequiredArgsConstructor
 public class AdminReviewController {
 
