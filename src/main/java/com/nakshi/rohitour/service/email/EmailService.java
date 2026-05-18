@@ -17,6 +17,11 @@ public class EmailService {
     @Value("${mail.from}")
     private String from;
 
+    @jakarta.annotation.PostConstruct
+    private void init() {
+        from = from.trim();
+    }
+
     /**
      * 이메일 인증코드 발송
      * Amazon SES SMTP → JavaMailSender 사용
