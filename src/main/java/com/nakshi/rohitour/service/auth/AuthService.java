@@ -346,8 +346,10 @@ public class AuthService {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "일치하는 회원 정보가 없습니다."));
 
-        // 2. 이름 + 휴대폰 일치 확인
-        if (!request.getName().equals(user.getName()) || !request.getPhone().equals(user.getPhone())) {
+        // 2. 이름 + 휴대폰 일치 확인 (하이픈 정규화 후 비교)
+        String reqPhone = request.getPhone().replaceAll("-", "");
+        String userPhone = user.getPhone() == null ? "" : user.getPhone().replaceAll("-", "");
+        if (!request.getName().equals(user.getName()) || !reqPhone.equals(userPhone)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "일치하는 회원 정보가 없습니다.");
         }
 
