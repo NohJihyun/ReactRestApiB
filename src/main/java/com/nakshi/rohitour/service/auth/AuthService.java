@@ -337,13 +337,13 @@ public class AuthService {
 
     /**
      * 비밀번호 재설정 이메일 발송
-     * - loginId + 이름 + 휴대폰으로 본인 확인
-     * - 확인되면 등록된 이메일로 재설정 링크 발송
+     * - 이메일 + 이름 + 휴대폰으로 본인 확인
+     * - 확인되면 해당 이메일로 재설정 링크 발송
      */
     @Transactional
     public void sendPasswordReset(PasswordResetSendRequest request) {
-        // 1. loginId로 사용자 조회
-        User user = userRepository.findByLoginId(request.getLoginId())
+        // 1. 이메일로 사용자 조회
+        User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "일치하는 회원 정보가 없습니다."));
 
         // 2. 이름 + 휴대폰 일치 확인
