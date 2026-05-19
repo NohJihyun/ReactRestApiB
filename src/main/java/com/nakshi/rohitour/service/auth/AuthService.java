@@ -47,6 +47,17 @@ public class AuthService {
     @Value("${app.frontend.url:http://localhost:3000}")
     private String frontendUrl;
 
+    // 전화번호를 XXX-XXXX-XXXX 형식으로 정규화
+    private static String normalizePhone(String phone) {
+        if (phone == null) return "";
+        String d = phone.replaceAll("[^0-9]", "");
+        if (d.length() == 11) return d.substring(0, 3) + "-" + d.substring(3, 7) + "-" + d.substring(7);
+        if (d.length() == 10) return d.substring(0, 2).equals("02")
+                ? d.substring(0, 2) + "-" + d.substring(2, 6) + "-" + d.substring(6)
+                : d.substring(0, 3) + "-" + d.substring(3, 6) + "-" + d.substring(6);
+        return phone;
+    }
+
     /**
      * 로그인 비즈니스 로직
      * AuthService는 로그인 시 사용자 조회와 검증을 담당하는 비즈니스 로직 계층이다.
@@ -281,7 +292,7 @@ public class AuthService {
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .birth(request.getBirth())
-                .phone(request.getPhone())
+                .phone(normalizePhone(request.getPhone()))
                 .provider(AuthProvider.LOCAL)
                 .role(UserRole.USER)
                 .isActive(true)
@@ -330,7 +341,7 @@ public class AuthService {
      * 아이디 찾기 - 이름 + 휴대폰으로 loginId 조회
      */
     public String findLoginId(String name, String phone) {
-        User user = userRepository.findByNameAndPhoneAndProvider(name, phone, AuthProvider.LOCAL)
+        User user = userRepository.findByNameAndPhoneAndProvider(name, normalizePhone(phone), AuthProvider.LOCAL)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "일치하는 회원 정보가 없습니다."));
         return user.getLoginId();
     }
