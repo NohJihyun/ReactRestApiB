@@ -57,7 +57,7 @@ public class AdminProductController {
     /* 등록 — 저장 후 발급된 productId 반환 */
     @PostMapping
     public Map<String, Long> insert(@RequestBody ProductDto dto, Principal principal) {
-        Long userId = userRepository.findByLoginId(principal.getName())
+        Long userId = userRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "인증 정보를 찾을 수 없습니다."))
                 .getUserId();
         dto.setCreatedBy(userId);
@@ -73,7 +73,7 @@ public class AdminProductController {
             @RequestBody ProductDto dto,
             Principal principal
     ) {
-        Long userId = userRepository.findByLoginId(principal.getName())
+        Long userId = userRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "인증 정보를 찾을 수 없습니다."))
                 .getUserId();
         dto.setProductId(id);
