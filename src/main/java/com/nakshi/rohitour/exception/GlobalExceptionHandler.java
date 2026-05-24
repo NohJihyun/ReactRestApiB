@@ -9,6 +9,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Map;
@@ -62,6 +63,15 @@ public class GlobalExceptionHandler {
         return Map.of(
                 "status", 400,
                 "message", msg
+        );
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    @ResponseStatus(HttpStatus.PAYLOAD_TOO_LARGE)
+    public Map<String, Object> handleMaxUploadSize(MaxUploadSizeExceededException e) {
+        return Map.of(
+                "status", 413,
+                "message", "이미지 용량이 너무 큽니다. 50MB 이하의 파일만 업로드 가능합니다."
         );
     }
 
