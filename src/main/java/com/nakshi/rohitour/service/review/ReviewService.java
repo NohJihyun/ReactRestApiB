@@ -195,8 +195,8 @@ public class ReviewService {
     }
 
     /* ── 내부 헬퍼 ── */
-    private User getUser(String loginId) {
-        return userRepository.findByLoginId(loginId)
+    private User getUser(String email) {
+        return userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
     }
 
