@@ -26,6 +26,7 @@ services:
       SPRING_PROFILES_ACTIVE: prod
     volumes:
       - /data/uploads:/data/uploads
+      - /data/logs:/data/logs
     depends_on:
       postgres:
         condition: service_healthy
