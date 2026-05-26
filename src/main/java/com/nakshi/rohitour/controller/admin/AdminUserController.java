@@ -9,6 +9,7 @@ import com.nakshi.rohitour.repository.booking.BookingMapper;
 import com.nakshi.rohitour.repository.review.ReviewMapper;
 import com.nakshi.rohitour.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -17,10 +18,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -33,11 +37,27 @@ public class AdminUserController {
     private final RefreshTokenRepository refreshTokenRepository;
     private final BookingMapper bookingMapper;
 
+    @Value("${app.super-admins}")
+    private String superAdminsRaw;
+
+    private Set<String> getSuperAdmins() {
+        return Set.copyOf(Arrays.asList(superAdminsRaw.split(",")));
+    }
+
+    private void requireSuperAdmin(Principal principal) {
+        if (principal == null || !getSuperAdmins().contains(principal.getName())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "권한이 없습니다.");
+        }
+    }
+
     @GetMapping("/users")
     public Map<String, Object> getUsers(
+            Principal principal,
             @RequestParam(defaultValue = "") String keyword,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "15") int size) {
+
+        requireSuperAdmin(principal);
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Page<User> userPage = keyword.isBlank()
@@ -59,7 +79,8 @@ public class AdminUserController {
     }
 
     @PatchMapping("/users/{id}/role")
-    public void changeRole(@PathVariable Long id, @RequestParam String role) {
+    public void changeRole(Principal principal, @PathVariable Long id, @RequestParam String role) {
+        requireSuperAdmin(principal);
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         user.setRole(UserRole.valueOf(role));
