@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nakshi.rohitour.repository.visit.VisitMapper">
+
+    <insert id="upsert">
+        INSERT INTO visits (visitor_uuid, device_type, visited_at)
+        VALUES (#{visitorUuid}, #{deviceType}, CURRENT_DATE)
+        ON CONFLICT (visitor_uuid, visited_at) DO NOTHING
+    </insert>
+
+    <select id="countToday" resultType="int">
+        SELECT COUNT(*) FROM visits WHERE visited_at = CURRENT_DATE
+    </select>
+
+    <select id="countTodayByDevice" resultType="int">
+        SELECT COUNT(*) FROM visits WHERE visited_at = CURRENT_DATE AND device_type = #{deviceType}
+    </select>
+
+</mapper>

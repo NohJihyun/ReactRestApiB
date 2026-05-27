@@ -91,6 +91,9 @@ public class SecurityConfig {
                         // 문의 등록 (비로그인 허용)
                         .requestMatchers(HttpMethod.POST, "/api/inquiries").permitAll()
 
+                        // 방문자 카운팅 (비로그인 허용)
+                        .requestMatchers(HttpMethod.POST, "/api/visit").permitAll()
+
                         // 예약 신청 (로그인 필수)
                         .requestMatchers(HttpMethod.POST, "/api/bookings").authenticated()
 

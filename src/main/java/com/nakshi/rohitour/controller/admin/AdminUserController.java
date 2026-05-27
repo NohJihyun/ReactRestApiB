@@ -8,6 +8,7 @@ import com.nakshi.rohitour.repository.auth.RefreshTokenRepository;
 import com.nakshi.rohitour.repository.booking.BookingMapper;
 import com.nakshi.rohitour.repository.review.ReviewMapper;
 import com.nakshi.rohitour.repository.user.UserRepository;
+import com.nakshi.rohitour.repository.visit.VisitMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -36,6 +37,7 @@ public class AdminUserController {
     private final ReviewMapper reviewMapper;
     private final RefreshTokenRepository refreshTokenRepository;
     private final BookingMapper bookingMapper;
+    private final VisitMapper visitMapper;
 
     @Value("${app.super-admins}")
     private String superAdminsRaw;
@@ -104,6 +106,9 @@ public class AdminUserController {
         long activeSessionCount = refreshTokenRepository.countByRevokedFalseAndExpiresAtAfter(LocalDateTime.now());
         int  reservedPeople     = bookingMapper.sumReservedPeople();
         int  confirmedPeople    = bookingMapper.sumConfirmedPeople();
+        int  todayVisitors      = visitMapper.countToday();
+        int  todayPcVisitors    = visitMapper.countTodayByDevice("PC");
+        int  todayMobileVisitors = visitMapper.countTodayByDevice("MOBILE");
 
         List<Map<String, Object>> monthly = userRepository.findMonthlyRegistrations().stream()
                 .map(row -> {
@@ -134,7 +139,8 @@ public class AdminUserController {
                 totalProducts, publishedProducts, draftProducts, hiddenProducts, endedProducts,
                 totalReviews, publishedReviews, hiddenReviews,
                 activeSessionCount, monthly, yearly, providerStats,
-                reservedPeople, confirmedPeople);
+                reservedPeople, confirmedPeople,
+                todayVisitors, todayPcVisitors, todayMobileVisitors);
     }
 
     public record UserDto(
@@ -164,5 +170,8 @@ public class AdminUserController {
             List<Map<String, Object>> yearlyRegistrations,
             List<Map<String, Object>> providerStats,
             int reservedPeople,
-            int confirmedPeople) {}
+            int confirmedPeople,
+            int todayVisitors,
+            int todayPcVisitors,
+            int todayMobileVisitors) {}
 }
