@@ -59,8 +59,6 @@ public class AdminUserController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "15") int size) {
 
-        requireSuperAdmin(principal);
-
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Page<User> userPage = keyword.isBlank()
                 ? userRepository.findAll(pageable)
