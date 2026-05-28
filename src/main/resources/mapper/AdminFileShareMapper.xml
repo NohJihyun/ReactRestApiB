@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nakshi.rohitour.repository.admin.AdminFileShareMapper">
+
+    <select id="findAllFolders" resultType="com.nakshi.rohitour.dto.FileShareFolderDto">
+        SELECT id, name, parent_id AS parentId, created_by AS createdBy, created_at AS createdAt
+        FROM file_share_folders
+        ORDER BY parent_id NULLS FIRST, name
+    </select>
+
+    <insert id="insertFolder" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO file_share_folders (name, parent_id, created_by, created_at)
+        VALUES (#{name}, #{parentId, jdbcType=BIGINT}, #{createdBy}, NOW())
+    </insert>
+
+    <update id="updateFolderName">
+        UPDATE file_share_folders SET name = #{name} WHERE id = #{id}
+    </update>
+
+    <delete id="deleteFolder">
+        DELETE FROM file_share_folders WHERE id = #{id}
+    </delete>
+
+    <select id="findLatestFilesByFolderId" resultType="com.nakshi.rohitour.dto.FileShareFileDto">
+        SELECT DISTINCT ON (group_id)
+            id, folder_id AS folderId, group_id AS groupId, version,
+            display_name AS displayName, original_name AS originalName,
+            file_path AS filePath, file_size AS fileSize,
+            uploaded_by AS uploadedBy, uploaded_at AS uploadedAt
+        FROM file_share_files
+        WHERE folder_id = #{folderId}
+        ORDER BY group_id, version DESC
+    </select>
+
+    <select id="findVersionsByGroupId" resultType="com.nakshi.rohitour.dto.FileShareFileDto">
+        SELECT id, folder_id AS folderId, group_id AS groupId, version,
+            display_name AS displayName, original_name AS originalName,
+            file_path AS filePath, file_size AS fileSize,
+            uploaded_by AS uploadedBy, uploaded_at AS uploadedAt
+        FROM file_share_files
+        WHERE group_id = #{groupId}
+        ORDER BY version DESC
+    </select>
+
+    <select id="findFileById" resultType="com.nakshi.rohitour.dto.FileShareFileDto">
+        SELECT id, folder_id AS folderId, group_id AS groupId, version,
+            display_name AS displayName, original_name AS originalName,
+            file_path AS filePath, file_size AS fileSize,
+            uploaded_by AS uploadedBy, uploaded_at AS uploadedAt
+        FROM file_share_files
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insertFile" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO file_share_files (folder_id, group_id, version, display_name, original_name, file_path, file_size, uploaded_by, uploaded_at)
+        VALUES (#{folderId}, #{groupId}, #{version}, #{displayName}, #{originalName}, #{filePath}, #{fileSize}, #{uploadedBy}, NOW())
+    </insert>
+
+    <update id="updateGroupId">
+        UPDATE file_share_files SET group_id = #{groupId} WHERE id = #{id}
+    </update>
+
+    <update id="updateFilePath">
+        UPDATE file_share_files SET file_path = #{filePath} WHERE id = #{id}
+    </update>
+
+    <select id="findNextVersion" resultType="int">
+        SELECT COALESCE(MAX(version), 0) + 1 FROM file_share_files WHERE group_id = #{groupId}
+    </select>
+
+    <delete id="deleteFile">
+        DELETE FROM file_share_files WHERE id = #{id}
+    </delete>
+
+</mapper>

@@ -9,6 +9,7 @@ import com.nakshi.rohitour.repository.user.UserRepository;
 import com.nakshi.rohitour.service.auth.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -19,6 +20,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/users")
@@ -28,6 +31,9 @@ public class UserController {
     private final AuthService authService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+
+    @Value("${app.file-share-admins:}")
+    private String fileShareAdminsRaw;
 
     @GetMapping("/me")
     public MeResponse me(Authentication authentication) {
@@ -47,6 +53,12 @@ public class UserController {
                 .or(() -> userRepository.findByLoginId(subject))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
+        Set<String> fileShareAdmins = fileShareAdminsRaw.isBlank()
+                ? Set.of()
+                : Set.copyOf(Arrays.asList(fileShareAdminsRaw.split(",")));
+        boolean isFileShareAdmin = fileShareAdmins.contains(user.getEmail())
+                || fileShareAdmins.contains(user.getLoginId());
+
         return new MeResponse(
                 user.getUserId(),
                 user.getLoginId(),
@@ -56,7 +68,8 @@ public class UserController {
                 user.getBirth(),
                 user.getProvider().name(),
                 role,
-                user.getCreatedAt()
+                user.getCreatedAt(),
+                isFileShareAdmin
         );
     }
 
@@ -115,6 +128,7 @@ public class UserController {
             LocalDate birth,
             String provider,
             String role,
-            LocalDateTime createdAt
+            LocalDateTime createdAt,
+            boolean fileShareAdmin
     ) {}
 }
