@@ -277,6 +277,10 @@
           AND status     = 'PENDING'
     </delete>
 
+    <delete id="deleteAllByProductId">
+        DELETE FROM bookings WHERE product_id = #{productId}
+    </delete>
+
     <!-- 내 예약 목록 (사용자) -->
     <select id="findByUserId" resultMap="BookingResult">
         SELECT

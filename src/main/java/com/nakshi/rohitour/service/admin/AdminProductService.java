@@ -8,6 +8,7 @@ import com.nakshi.rohitour.dto.ReviewDto;
 import com.nakshi.rohitour.dto.ReviewImageDto;
 import com.nakshi.rohitour.exception.DuplicateException;
 import com.nakshi.rohitour.repository.admin.AdminProductMapper;
+import com.nakshi.rohitour.repository.booking.BookingMapper;
 import com.nakshi.rohitour.repository.review.ReviewImageMapper;
 import com.nakshi.rohitour.repository.review.ReviewMapper;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,16 +27,19 @@ public class AdminProductService {
     private final AdminProductMapper productMapper;
     private final ReviewMapper reviewMapper;
     private final ReviewImageMapper reviewImageMapper;
+    private final BookingMapper bookingMapper;
 
     @Value("${app.upload.base-dir}")
     private String uploadBaseDir;
 
     public AdminProductService(AdminProductMapper productMapper,
                                ReviewMapper reviewMapper,
-                               ReviewImageMapper reviewImageMapper) {
+                               ReviewImageMapper reviewImageMapper,
+                               BookingMapper bookingMapper) {
         this.productMapper    = productMapper;
         this.reviewMapper     = reviewMapper;
         this.reviewImageMapper = reviewImageMapper;
+        this.bookingMapper    = bookingMapper;
     }
 
     /* 목록 + 검색 + 페이지네이션 */
@@ -93,7 +97,7 @@ public class AdminProductService {
         return productMapper.deactivate(id);
     }
 
-    /* 물리 삭제 — 후기 이미지 파일 정리 후 삭제 */
+    /* 물리 삭제 — 예약·후기 연관 데이터 정리 후 삭제 */
     @Transactional
     public int delete(Long id) throws IOException {
         List<ReviewDto> reviews = reviewMapper.findAllByProductId(id);
@@ -102,6 +106,7 @@ public class AdminProductService {
             for (ReviewImageDto img : images) deletePhysicalFile(img.getImagePath());
         }
         reviewMapper.deleteAllByProductId(id);
+        bookingMapper.deleteAllByProductId(id);
         return productMapper.delete(id);
     }
 

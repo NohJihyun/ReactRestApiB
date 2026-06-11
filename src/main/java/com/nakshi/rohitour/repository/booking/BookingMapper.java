@@ -43,4 +43,6 @@ public interface BookingMapper {
 
     void delete(@Param("bookingId") Long bookingId,
                 @Param("userId") Long userId);
+
+    void deleteAllByProductId(Long productId);
 }
