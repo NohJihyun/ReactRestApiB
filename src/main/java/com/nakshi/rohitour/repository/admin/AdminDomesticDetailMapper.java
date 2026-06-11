@@ -10,6 +10,6 @@ public interface AdminDomesticDetailMapper {
     DomesticDetailDto findByProductId(@Param("productId") Long productId);
 
     int insert(DomesticDetailDto dto);
-
     int update(DomesticDetailDto dto);
+    void deleteByProductId(@Param("productId") Long productId);
 }

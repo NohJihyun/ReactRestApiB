@@ -66,4 +66,8 @@
         DELETE FROM air_itineraries WHERE id = #{id}
     </delete>
 
+    <delete id="deleteByProductId">
+        DELETE FROM air_itineraries WHERE product_id = #{productId}
+    </delete>
+
 </mapper>

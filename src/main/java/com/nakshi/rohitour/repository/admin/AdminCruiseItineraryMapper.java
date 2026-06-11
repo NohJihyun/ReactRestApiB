@@ -18,4 +18,5 @@ public interface AdminCruiseItineraryMapper {
     int update(CruiseItineraryDto dto);
 
     int delete(@Param("id") Long id);
+    void deleteByProductId(@Param("productId") Long productId);
 }

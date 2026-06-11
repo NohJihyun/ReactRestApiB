@@ -18,4 +18,5 @@ public interface AdminAirItineraryMapper {
     int update(AirItineraryDto dto);
 
     int delete(@Param("id") Long id);
+    void deleteByProductId(@Param("productId") Long productId);
 }

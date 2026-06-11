@@ -10,6 +10,6 @@ public interface AdminSchoolTripDetailMapper {
     SchoolTripDetailDto findByProductId(@Param("productId") Long productId);
 
     int insert(SchoolTripDetailDto dto);
-
     int update(SchoolTripDetailDto dto);
+    void deleteByProductId(@Param("productId") Long productId);
 }

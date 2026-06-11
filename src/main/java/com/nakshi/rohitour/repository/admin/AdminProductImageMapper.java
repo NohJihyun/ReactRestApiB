@@ -18,6 +18,7 @@ public interface AdminProductImageMapper {
     int insert(ProductImageDto dto);
 
     int delete(@Param("id") Long id);
+    int deleteByProductId(@Param("productId") Long productId);
 
     int updateOrder(@Param("id") Long id, @Param("sortOrder") int sortOrder);
 }

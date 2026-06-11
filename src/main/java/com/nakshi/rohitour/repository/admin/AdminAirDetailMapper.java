@@ -10,6 +10,6 @@ public interface AdminAirDetailMapper {
     AirDetailDto findByProductId(@Param("productId") Long productId);
 
     int insert(AirDetailDto dto);
-
     int update(AirDetailDto dto);
+    void deleteByProductId(@Param("productId") Long productId);
 }

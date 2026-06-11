@@ -101,4 +101,8 @@
         WHERE product_id = #{productId}
     </update>
 
+    <delete id="deleteByProductId">
+        DELETE FROM air_details WHERE product_id = #{productId}
+    </delete>
+
 </mapper>

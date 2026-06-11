@@ -20,4 +20,5 @@ public interface AdminDomesticItineraryImageMapper {
     int delete(@Param("id") Long id);
 
     int deleteByItineraryId(@Param("itineraryId") Long itineraryId);
+    void deleteByProductId(@Param("productId") Long productId);
 }

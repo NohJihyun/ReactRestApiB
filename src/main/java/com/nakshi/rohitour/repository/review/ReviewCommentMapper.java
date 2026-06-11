@@ -14,4 +14,5 @@ public interface ReviewCommentMapper {
     void update(ReviewCommentDto dto);
     void delete(@Param("id") Long id);
     void deleteByReviewId(@Param("reviewId") Long reviewId);
+    void deleteByProductId(@Param("productId") Long productId);
 }

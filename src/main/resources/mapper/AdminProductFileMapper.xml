@@ -48,4 +48,8 @@
         DELETE FROM product_files WHERE id = #{id}
     </delete>
 
+    <delete id="deleteByProductId">
+        DELETE FROM product_files WHERE product_id = #{productId}
+    </delete>
+
 </mapper>

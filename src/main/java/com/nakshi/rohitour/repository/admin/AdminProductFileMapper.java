@@ -18,4 +18,5 @@ public interface AdminProductFileMapper {
     int insert(ProductFileDto dto);
 
     int delete(@Param("id") Long id);
+    int deleteByProductId(@Param("productId") Long productId);
 }

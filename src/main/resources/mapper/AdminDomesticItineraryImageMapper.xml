@@ -50,4 +50,8 @@
         DELETE FROM domestic_itinerary_images WHERE itinerary_id = #{itineraryId}
     </delete>
 
+    <delete id="deleteByProductId">
+        DELETE FROM domestic_itinerary_images WHERE itinerary_id IN (SELECT id FROM domestic_itineraries WHERE product_id = #{productId})
+    </delete>
+
 </mapper>

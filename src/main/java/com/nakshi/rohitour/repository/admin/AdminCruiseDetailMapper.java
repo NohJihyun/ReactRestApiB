@@ -8,4 +8,5 @@ public interface AdminCruiseDetailMapper {
     CruiseDetailDto findByProductId(Long productId);
     void insert(CruiseDetailDto dto);
     void update(CruiseDetailDto dto);
+    void deleteByProductId(Long productId);
 }

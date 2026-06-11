@@ -51,6 +51,10 @@
         DELETE FROM product_images WHERE id = #{id}
     </delete>
 
+    <delete id="deleteByProductId">
+        DELETE FROM product_images WHERE product_id = #{productId}
+    </delete>
+
     <!-- 순서 변경 -->
     <update id="updateOrder">
         UPDATE product_images

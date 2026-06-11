@@ -18,4 +18,5 @@ public interface AdminSchoolTripItineraryMapper {
     int update(SchoolTripItineraryDto dto);
 
     int delete(@Param("id") Long id);
+    void deleteByProductId(@Param("productId") Long productId);
 }

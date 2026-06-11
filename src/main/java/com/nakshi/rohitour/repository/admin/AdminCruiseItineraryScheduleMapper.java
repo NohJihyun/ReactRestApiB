@@ -13,4 +13,5 @@ public interface AdminCruiseItineraryScheduleMapper {
     void update(CruiseItineraryScheduleDto dto);
     void delete(Long id);
     void deleteByItineraryId(Long itineraryId);
+    void deleteByProductId(Long productId);
 }

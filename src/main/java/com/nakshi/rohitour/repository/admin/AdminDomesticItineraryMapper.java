@@ -18,4 +18,5 @@ public interface AdminDomesticItineraryMapper {
     int update(DomesticItineraryDto dto);
 
     int delete(@Param("id") Long id);
+    void deleteByProductId(@Param("productId") Long productId);
 }
